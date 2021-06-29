@@ -1,0 +1,44 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.IO;
+
+namespace HomeWork1
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Dictionary<string, string> word = new Dictionary<string, string>
+            {
+                { "Томат", "однолетнее или многолетнее травянистое растение, вид рода Паслён (Solanum)[2] семейства Паслёновые (Solanaceae)" },
+                { "Огурец", "однолетнее травянистое растение, вид рода Огурец (Cucumis) семейства Тыквенные (Cucurbitaceae), овощная культура" },
+                { "Тыква", "род травянистых растений семейства Тыквенные (Cucurbitaceae)" },
+                { "Патиссон", "однолетнее травянистое растение семейства Тыквенные, разновидность тыквы обыкновенной (Cucurbita pepo)" },
+            };
+            bool isWork = true;
+            string userWord = "";
+
+            while (isWork)
+            {
+                Console.WriteLine("Введите название овоща, чтобы узнать определение (Томат, Огурец, Тыква, Патиссон) или Exit для выхода из программы: ");
+                userWord = Console.ReadLine();
+
+                if (word.ContainsKey(userWord))
+                {
+                    Console.WriteLine($"{userWord} - это {word[userWord]}.\n");
+                }
+                else if (userWord == "Exit")
+                {
+                    isWork = false;
+                }
+                else
+                {
+                    Console.WriteLine("Такого слова нет словаре.\n");
+                }
+            }
+        }
+    }
+}
