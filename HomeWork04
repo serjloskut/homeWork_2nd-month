@@ -1,0 +1,70 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.IO;
+
+namespace HomeWork1
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Dictionary<string, string> dossiers = new Dictionary<string, string>();
+            int userCommand;
+            bool isContinue = true;
+
+            while (isContinue)
+            {
+                Console.WriteLine("1. Добавить досье.\n2. Вывести все досье.\n3. Удалить досье.\n4. Выход из программы.\n");
+                Console.Write("Введите команду: ");
+                userCommand = Convert.ToInt32(Console.ReadLine());
+
+                switch (userCommand)
+                {
+                    case 1:
+                        AddDossier(dossiers);
+                        break;
+                    case 2:
+                        OutputAllDossiers(dossiers);
+                        break;
+                    case 3:
+                        RemoveDossier(dossiers);
+                        break;
+                    case 4:
+                        isContinue = false;
+                        break;
+                }
+            }
+        }
+
+        static void AddDossier(Dictionary<string,string> dossiers)
+        {
+            string fullName = "";
+            Console.Write("Введите Фамилию: ");
+            fullName += (Console.ReadLine()+" ");
+            Console.Write("Введите Имя: ");
+            fullName += (Console.ReadLine() + " ");
+            Console.Write("Введите Отчество: ");
+            fullName += Console.ReadLine();
+            Console.Write("Введите Должность: ");
+            dossiers.Add(fullName, Console.ReadLine());
+            Console.WriteLine();
+        }
+
+        static void OutputAllDossiers(Dictionary<string,string> dossiers)
+        {
+            foreach (var dossier in dossiers)
+            {
+                Console.WriteLine($"{dossier.Key} - {dossier.Value}");
+            }
+        }
+
+        static void RemoveDossier(Dictionary<string, string> dossiers)
+        {
+            Console.Write("Введите Фамилию Имя Отчество для удаления досье: ");
+            dossiers.Remove(Console.ReadLine());
+        }
+    }
+}
