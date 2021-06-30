@@ -1,0 +1,37 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.IO;
+
+namespace HomeWork1
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Queue<int> amountPurchase = new Queue<int>();
+            Random random = new Random();
+            int sumPurchase=0;
+            int tempAmountPurchase;
+
+            amountPurchase.Enqueue(random.Next(100,5000));
+            amountPurchase.Enqueue(random.Next(100, 5000));
+            amountPurchase.Enqueue(random.Next(100, 5000));
+            amountPurchase.Enqueue(random.Next(100, 5000));
+            amountPurchase.Enqueue(random.Next(100, 5000));
+            amountPurchase.Enqueue(random.Next(100, 5000));
+            amountPurchase.Enqueue(random.Next(100, 5000));
+
+            while(amountPurchase.Count>0)
+            {
+                tempAmountPurchase = amountPurchase.Dequeue();
+                Console.WriteLine($"В кассе у Вас {sumPurchase} рублей.\nСумма покупки следующего покупателя: {tempAmountPurchase} рублей. Нажмите любую клавише, чтобы обслужить покупателя");
+                sumPurchase += tempAmountPurchase;
+                Console.ReadKey();
+                Console.Clear();
+            }
+        }
+    }
+}
