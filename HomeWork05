@@ -1,0 +1,53 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.IO;
+
+namespace HomeWork1
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Player Alex = new Player();
+            Alex.ShowInfoPlayer();
+
+            Player Jonh = new Player("Jonh", 23, 159, 65);
+            Jonh.ShowInfoPlayer();
+
+            Console.ReadKey();
+        }
+    }
+
+    class Player
+    {
+        private string _name;
+        private int _age;
+        private int _height;
+        private int _weight;
+
+        public Player(string name, int age, int height, int weight)
+        {
+            _name = name;
+            _age = age;
+            _height = height;
+            _weight = weight;
+        }
+
+        public Player()
+        {
+            _name = "Алексей";
+            _age = 18;
+            _height = 170;
+            _weight = 80;
+        }
+
+        public void ShowInfoPlayer()
+        {
+            Console.WriteLine($"Игрока зовут {_name}. Ему {_age} лет. Его рост {_height} см, вес {_weight} кг");
+        }
+
+    }
+}
