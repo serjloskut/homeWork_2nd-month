@@ -13,7 +13,6 @@ namespace HomeWork1
         {
             Player Alex = new Player();
             Alex.ShowInfoPlayer();
-
             Player Jonh = new Player("Jonh", 23, 159, 65);
             Jonh.ShowInfoPlayer();
 
@@ -48,6 +47,5 @@ namespace HomeWork1
         {
             Console.WriteLine($"Игрока зовут {_name}. Ему {_age} лет. Его рост {_height} см, вес {_weight} кг");
         }
-
     }
 }
