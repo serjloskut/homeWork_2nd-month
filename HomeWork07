@@ -11,8 +11,7 @@ namespace HomeWork1
     {
         static void Main(string[] args)
         {
-            List<Player> players = new List<Player>();
-            Database database = new Database(players);
+            Database database = new Database(new List<Player>());
             bool isContinue = true;
 
             while (isContinue)
