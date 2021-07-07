@@ -13,6 +13,7 @@ namespace HomeWork1
         {
             bool isContinue = true;
             Database database = new Database();
+            Database database2 = new Database();
 
             while (isContinue)
             {
