@@ -11,8 +11,8 @@ namespace HomeWork1
     {
         static void Main(string[] args)
         {
-            Database database = new Database(new List<Player>());
             bool isContinue = true;
+            Database database = new Database();
 
             while (isContinue)
             {
@@ -50,12 +50,7 @@ namespace HomeWork1
 
         class Database
         {
-            List<Player> _players;
-
-            public Database(List<Player> players)
-            {
-                _players = players;
-            }
+            List<Player> _players = new List<Player>();
 
             public void AddPlayer()
             {
