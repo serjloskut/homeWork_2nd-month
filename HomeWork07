@@ -1,0 +1,129 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.IO;
+
+namespace HomeWork1
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            List<Player> players = new List<Player>();
+            Database database = new Database(players);
+
+            Console.ReadKey();
+        }
+
+        static void DeletePlayer(List<Player> players)
+        {
+            int number;
+            OutputAllPlayer(players);
+            Console.Write("\nВведите номер игрока, которого необходимо удалить: ");
+            number = Convert.ToInt32(Console.ReadLine());
+
+            if (number <= players.Count)
+            {
+                players.RemoveAt(number - 1);
+                Console.WriteLine("Игрок удален");
+            }
+            else
+                Console.WriteLine("Ошибка: Игрока с таким порядковым номером не существует");
+        }
+
+        static void AddPlayer(List<Player> players)
+        {
+            string name = string.Empty;
+
+            Console.Write("Введите имя игрока: ");
+            name = Console.ReadLine();
+
+            players.Add(new Player(players.Count + 1, name)); ;
+        }
+
+        static void BannedPlayer(List<Player> players)
+        {
+            int number;
+            OutputAllPlayer(players);
+            Console.Write("\nВведите номер игрока, которого необходимо забанить: ");
+            number = Convert.ToInt32(Console.ReadLine());
+
+            if (number <= players.Count)
+            {
+                if(players[number - 1].IsBanned == false)
+                {
+                    players[number - 1].IsBanned = true;
+                    Console.WriteLine("Игрок забанен");
+                }
+                else
+                    Console.WriteLine("Ошибка: Игрок уже забанен");
+            }
+            else
+                Console.WriteLine("Ошибка: Игрока с таким порядковым номером не существует");
+        }
+
+        static void UnBannedPlayer(List<Player> players)
+        {
+            int number;
+            OutputAllPlayer(players);
+            Console.Write("\nВведите номер игрока, которого необходимо разбанить: ");
+            number = Convert.ToInt32(Console.ReadLine());
+
+            if (number <= players.Count)
+            {
+                if (players[number - 1].IsBanned == true)
+                {
+                    players[number - 1].IsBanned = false;
+                    Console.WriteLine("Игрок разбанен");
+                }
+                else
+                    Console.WriteLine("Ошибка: Игрок не забанен");
+            }
+            else
+                Console.WriteLine("Ошибка: Игрока с таким порядковым номером не существует");
+        }
+
+        static void OutputAllPlayer(List<Player> players)
+        {
+            Console.WriteLine("Список всех игроков:");
+
+            for (int i = 0; i < players.Count; i++)
+            {
+                Console.WriteLine($"{players[i].Number}. {players[i].Name}");
+            }
+        }
+
+        class Database
+        {
+            List<Player> _players;
+
+            public Database(List<Player> players)
+            {
+                _players = players;
+            }
+        }
+
+        class Player
+        {
+            int _number;
+            string _name;
+            int _level;
+            bool _isBanned;
+
+            public int Number { get; private set; }
+            public string Name { get; private set; }
+            public int Level { get; set; }
+            public bool IsBanned { get; set; }
+
+            public Player(int number, string name, int level = 1, bool isBanned = false)
+            {
+                _number = number;
+                _name = name;
+                _level = level;
+                _isBanned = isBanned;
+            }
+        }
+    }
+}
