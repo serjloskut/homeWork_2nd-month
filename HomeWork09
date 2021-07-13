@@ -1,0 +1,111 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.IO;
+
+namespace HomeWork1
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Random random = new Random();
+            int countTickets = 0;
+            int countSeats = 0;
+            Train train = new Train();
+            bool isContinue = true;
+
+
+            while (isContinue)
+            {
+                if (train.IsSend)
+                    Console.WriteLine("Нет сформированных поездов\n");
+                else
+                    Console.WriteLine($"Формируется поезд направления {train.CityDeparture} - {train.CityArrival}. Продано: {countTickets}/{countSeats} билетов\n");
+
+                Console.WriteLine("Выберите необходимое действие:\n" +
+                    "1. Создать направление\n" +
+                    "2. Продать билеты\n" +
+                    "3. Сформировать поезд\n" +
+                    "4. ОТправить поезд");
+
+                switch (Convert.ToInt32(Console.ReadLine()))
+                {
+                    case 1:
+                        train.CreateDirectionMovement();
+                        break;
+                    case 2:
+                        countTickets = random.Next(30, 52);
+                        break;
+                    case 3:
+                        countSeats=train.Form(countTickets);
+                        break;
+                    case 4:
+                        train.Send();
+                        break;
+                    default:
+                        Console.WriteLine("Введена неверная команда.");
+                        break;
+                }
+
+                Console.Clear();
+            }
+        }
+
+        class Train
+        {
+            List<RailwayCarriage> _railwayCarriages = new List<RailwayCarriage>();
+
+            public string CityDeparture { get; private set; }
+            public string CityArrival { get; private set; }
+            public bool IsSend { get; private set; }
+
+            public Train()
+            {
+                IsSend = true;
+            }
+
+            public void CreateDirectionMovement()
+            {
+                IsSend = false;
+                Console.Write("Введите город отправления: ");
+                CityDeparture = Console.ReadLine();
+                Console.Write("Введите город прибытия: ");
+                CityArrival = Console.ReadLine();
+            }
+            public int Form(int seats)
+            {
+                int sumSeat = 0;
+                int userCountSeat;
+
+                while (seats > sumSeat)
+                {
+                    Console.Write("Введите количество мест в вагоне: ");
+                    userCountSeat = Convert.ToInt32(Console.ReadLine());
+                    _railwayCarriages.Add(new RailwayCarriage(userCountSeat));
+                    sumSeat += userCountSeat;
+                    Console.WriteLine($"Занято {sumSeat} из {seats}\n");
+                }
+                return sumSeat;
+            }
+
+            public void Send()
+            {
+                Console.WriteLine("Поезд отправлен!\nНажмите любую клавишу для продолжения.");
+                Console.ReadKey();
+                IsSend = true;
+            }
+        }
+
+        class RailwayCarriage
+        {
+            public int CountSeat { get; private set; }
+            public RailwayCarriage(int count)
+            {
+                CountSeat = count;
+            }
+        }
+    }
+}
