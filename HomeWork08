@@ -41,12 +41,19 @@ namespace HomeWork1
             }
 
             Console.ReadKey();
+        }
 
+        static void Print(List<Product> basket)
+        {
+            foreach (var product in basket)
+            {
+                Console.WriteLine($"1. {product.Name} - {product.Quantity} шт.");
+            }
         }
 
         class Seller
         {
-            List<Product> basket = new List<Product>(1);
+            List<Product> _basket = new List<Product>();
 
             public Seller()
             {
@@ -56,12 +63,7 @@ namespace HomeWork1
             public void PrintBasket()
             {
                 Console.WriteLine("В магазине в наличии следующие продукты:");
-
-                foreach (var product in basket)
-                {
-                    Console.WriteLine($"1. {product.Name} - {product.Quantity} шт.");
-                }
-
+                Print(_basket);
                 Console.WriteLine();
             }
 
@@ -71,7 +73,7 @@ namespace HomeWork1
                 string nameProduct = name;
                 int quantityProduct = quantity;
 
-                foreach (var product in basket)
+                foreach (var product in _basket)
                 {
                     if (product.Name == nameProduct && product.Quantity >= quantityProduct)
                         isProduct = true;
@@ -80,30 +82,30 @@ namespace HomeWork1
                 return isProduct;
             }
 
-            private void AddProduct()
-            {
-                basket.Add(new Product("Огурцы", 7));
-                basket.Add(new Product("Капуста", 20));
-                basket.Add(new Product("Пельмени", 14));
-                basket.Add(new Product("Колбаса", 3));
-            }
-
             public void SellProduct(string name, int quantity)
             {
                 string nameProduct = name;
                 int quantityProduct = quantity;
 
-                foreach (var product in basket)
+                foreach (var product in _basket)
                 {
                     if (product.Name == nameProduct)
-                        product.Quantity -= quantityProduct;
+                        product.Sell(quantityProduct);
                 }
+            }
+
+            private void AddProduct()
+            {
+                _basket.Add(new Product("Огурцы", 7));
+                _basket.Add(new Product("Капуста", 20));
+                _basket.Add(new Product("Пельмени", 14));
+                _basket.Add(new Product("Колбаса", 3));
             }
         }
 
         class User
         {
-            List<Product> basket = new List<Product>();
+            List<Product> _basket = new List<Product>();
 
             public void AddProduct(Seller seller)
             {
@@ -117,7 +119,7 @@ namespace HomeWork1
 
                 if (seller.IsProduct(name, quantity))
                 {
-                    basket.Add(new Product(name, quantity));
+                    _basket.Add(new Product(name, quantity));
                     seller.SellProduct(name,quantity);
                 }
                 else
@@ -130,12 +132,7 @@ namespace HomeWork1
             {
                 Console.Clear();
                 Console.WriteLine("В вашей корзине находятся следующие продукты:");
-
-                foreach (var product in basket)
-                {
-                    Console.WriteLine($"1. {product.Name} - {product.Quantity} шт.");
-                }
-
+                Print(_basket);
                 Console.WriteLine();
             }
         }
@@ -143,11 +140,16 @@ namespace HomeWork1
         class Product
         {
             public string Name { get; private set; }
-            public int Quantity { get; set; }
+            public int Quantity { get; private set; }
             public Product(string name, int quantity )
             {
                 Name = name;
                 Quantity = quantity;
+            }
+
+            public void Sell(int quantity)
+            {
+                Quantity -= quantity;
             }
         }
     }
