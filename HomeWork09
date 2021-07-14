@@ -11,101 +11,162 @@ namespace HomeWork1
     {
         static void Main(string[] args)
         {
-            Random random = new Random();
-            int countTickets = 0;
-            int countSeats = 0;
-            Train train = new Train();
+            Buyer buyer = new Buyer();
+            Seller seller = new Seller();
+            Magazine magazine = new Magazine();
+            Product[] products = { new Product("Огурец"), new Product("Банан"), new Product("Сыр"), new Product("Чупа-чупс") };
+
             bool isContinue = true;
 
+            seller.AcceptProduct(products);
 
             while (isContinue)
             {
-                if (train.IsSend)
-                    Console.WriteLine("Нет сформированных поездов\n");
-                else
-                    Console.WriteLine($"Формируется поезд направления {train.CityDeparture} - {train.CityArrival}. Продано: {countTickets}/{countSeats} билетов\n");
+                Console.SetCursorPosition(0, 15);
+                Console.WriteLine("Товары в наличии:");
+                seller.Show();
 
-                Console.WriteLine("Выберите необходимое действие:\n" +
-                    "1. Создать направление\n" +
-                    "2. Продать билеты\n" +
-                    "3. Сформировать поезд\n" +
-                    "4. ОТправить поезд");
+                Console.SetCursorPosition(0, 0);
+                Console.WriteLine("Доступные действие:\n" +
+                    "1. Купить товар.\n" +
+                    "2. Показать свою корзину.\n" +
+                    "3. Выйти из магазина.\n");
+                Console.Write("Введите номер действия: ");
 
-                switch (Convert.ToInt32(Console.ReadLine()))
+                switch (Console.ReadLine())
                 {
-                    case 1:
-                        train.CreateDirectionMovement();
+                    case "1":
+                        Console.Write("Введите название продукта: ");
+                        string userNameProduct = Console.ReadLine();
+
+                        if (!seller.IsProductInStock(seller.GetProduct(userNameProduct)))
+                            break;
+
+                        Console.Write("Введите количество продукта: ");
+                        int userCountProduct = Convert.ToInt32(Console.ReadLine());
+
+                        if (!seller.IsQuantityOfProductInStock(seller.GetProduct(userNameProduct), userCountProduct))
+                            break;
+
+                        magazine.MakeSale(seller, buyer, userNameProduct, userCountProduct);
+
+                        Console.Write("Покупка успешно завершена. Нажмите любую клавишу для продолжения...");
+                        Console.ReadKey();
                         break;
-                    case 2:
-                        countTickets = random.Next(30, 52);
+                    case "2":
+                        buyer.Show();
+
+                        Console.Write("Нажмите любую клавишу для продолжения: ");
+                        Console.ReadKey();
                         break;
-                    case 3:
-                        countSeats=train.Form(countTickets);
-                        break;
-                    case 4:
-                        train.Send();
+                    case "3":
+                        isContinue = false;
                         break;
                     default:
-                        Console.WriteLine("Введена неверная команда.");
+                        Console.Write("Команда не распознана. Нажмите любую клавишу для повторного выбора...");
+                        Console.ReadKey();
                         break;
                 }
-
                 Console.Clear();
             }
         }
+    }
 
-        class Train
+    class Product
+    {
+        public string Name { get; private set; }
+
+        public Product(string name)
         {
-            List<RailwayCarriage> _railwayCarriages = new List<RailwayCarriage>();
+            Name = name;
+        }
+    }
 
-            public string CityDeparture { get; private set; }
-            public string CityArrival { get; private set; }
-            public bool IsSend { get; private set; }
-
-            public Train()
-            {
-                IsSend = true;
-            }
-
-            public void CreateDirectionMovement()
-            {
-                IsSend = false;
-                Console.Write("Введите город отправления: ");
-                CityDeparture = Console.ReadLine();
-                Console.Write("Введите город прибытия: ");
-                CityArrival = Console.ReadLine();
-            }
-            public int Form(int seats)
-            {
-                int sumSeat = 0;
-                int userCountSeat;
-
-                while (seats > sumSeat)
-                {
-                    Console.Write("Введите количество мест в вагоне: ");
-                    userCountSeat = Convert.ToInt32(Console.ReadLine());
-                    _railwayCarriages.Add(new RailwayCarriage(userCountSeat));
-                    sumSeat += userCountSeat;
-                    Console.WriteLine($"Занято {sumSeat} из {seats}\n");
-                }
-                return sumSeat;
-            }
-
-            public void Send()
-            {
-                Console.WriteLine("Поезд отправлен!\nНажмите любую клавишу для продолжения.");
-                Console.ReadKey();
-                IsSend = true;
-            }
+    class Buyer
+    {
+        protected Dictionary<Product, int> Basket;
+        public Buyer()
+        {
+            Basket = new Dictionary<Product, int>();
         }
 
-        class RailwayCarriage
+        protected void BuyProduct(Product product, int quantity)
         {
-            public int CountSeat { get; private set; }
-            public RailwayCarriage(int count)
+            if (Basket.ContainsKey(product))
+                Basket[product] += quantity;
+            else
+                Basket.Add(product, quantity);
+        }
+
+        protected void SellProduct(Product product, int quantitySell)
+        {
+            Basket[product] -= quantitySell;
+
+            if (Basket[product] == 0)
+                Basket.Remove(product);
+        }
+
+        public void Show()
+        {
+            foreach (var product in Basket)
             {
-                CountSeat = count;
+                Console.WriteLine($"{product.Key.Name} - {product.Value} шт.");
             }
+        }
+    }
+
+    class Seller : Buyer
+    {
+        public Product GetProduct(string nameProduct)
+        {
+            foreach (var product in Basket)
+            {
+                if (product.Key.Name == nameProduct)
+                {
+                    return product.Key;
+                }
+            }
+
+            return null;
+        }
+
+        public bool IsProductInStock(Product product)
+        {
+            if (!Basket.ContainsKey(product))
+            {
+                Console.WriteLine("Этого продукта нет в наличии! Нажмите лубую клавишу для продолжения...");
+                Console.ReadKey();
+            }
+
+            return Basket.ContainsKey(product);
+        }
+
+        public bool IsQuantityOfProductInStock(Product product, int quantity)
+        {
+            if (!(Basket[product] >= quantity))
+            {
+                Console.WriteLine("Такого количества продукта нет в наличии! Нажмите лубую клавишу для продолжения...");
+                Console.ReadKey();
+            }
+
+            return Basket[product] >= quantity;
+        }
+
+        public void AcceptProduct(Product[] products)
+        {
+            Random random = new Random();
+
+            for (int i = 0; i < products.Length; i++)
+                BuyProduct(products[i], random.Next(10, 30));
+        }
+    }
+
+    class Magazine : Buyer
+    {
+        public void MakeSale(Seller seller, Buyer buyer, string userNameProduct, int userCountProduct)
+        {
+            BuyProduct(seller.GetProduct(userNameProduct), userCountProduct);
+            SellProduct(seller.GetProduct(userNameProduct), userCountProduct);
         }
     }
 }
