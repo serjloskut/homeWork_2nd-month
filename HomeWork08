@@ -11,146 +11,148 @@ namespace HomeWork1
     {
         static void Main(string[] args)
         {
-            User buyer = new User();
-            Seller seller = new Seller();
+            People buyer = new People();
+            People seller = new People();
+            Product cucumber = new Product("Огурец");
+            Product banana = new Product("Банан");
+            Product cheese = new Product("Сыр");
+            Product chupaChups = new Product("Чупа-чупс");
             bool isContinue = true;
+
+            AddProductSeller(seller, cucumber, banana, cheese, chupaChups);
 
             while (isContinue)
             {
-                Console.WriteLine("Выберите действие:\n1. Купить что-то.\n2. Посмотреть свою корзину.\n3. Выход из программы");
+                Console.SetCursorPosition(0, 15);
+                Console.WriteLine("Товары в наличии:");
+                seller.Show();
 
-                Console.SetCursorPosition(0,15);
-                seller.PrintBasket();
-                Console.SetCursorPosition(0, 4);
+                Console.SetCursorPosition(0, 0);
+                Console.WriteLine("Доступные действие:\n" +
+                    "1. Купить товар.\n" +
+                    "2. Показать свою корзину.\n" +
+                    "3. Выйти из магазина.\n");
+                Console.Write("Введите номер действия: ");
 
-                switch (Convert.ToInt32(Console.ReadLine()))
+                switch (Console.ReadLine())
                 {
-                    case 1:
-                        buyer.AddProduct(seller);
+                    case "1":
+                        Console.Write("Введите название продукта: ");
+                        string userNameProduct = Console.ReadLine();
+
+                        if (!seller.IsProduct(seller.GetProduct(userNameProduct)))
+                            break;
+
+                        Console.Write("Введите количество продукта: ");
+                        int userCountProduct = Convert.ToInt32(Console.ReadLine());
+
+                        if (!seller.IsQuantityProduct(seller.GetProduct(userNameProduct), userCountProduct))
+                            break;
+
+                        buyer.BuyProduct(seller.GetProduct(userNameProduct), userCountProduct);
+                        seller.SellProduct(seller.GetProduct(userNameProduct), userCountProduct);
+
+                        Console.Write("Покупка успешно завершена. Нажмите любую клавишу для продолжения...");
+                        Console.ReadKey();
                         break;
-                    case 2:
-                        buyer.PrintBasket();
+                    case "2":
+                        buyer.Show();
+
+                        Console.Write("Нажмите любую клавишу для продолжения: ");
+                        Console.ReadKey();
                         break;
-                    case 3:
-                        isContinue=false;
+                    case "3":
+                        isContinue = false;
                         break;
                     default:
-                        Console.WriteLine("Неверная команда. Попробуйте еще раз");
+                        Console.Write("Команда не распознана. Нажмите любую клавишу для повторного выбора...");
+                        Console.ReadKey();
                         break;
                 }
+                Console.Clear();
             }
-
-            Console.ReadKey();
         }
 
-        static void Print(List<Product> basket)
+        static void AddProductSeller(People people, Product product1, Product product2, Product product3, Product product4)
+        {
+            people.BuyProduct(product1, 15);
+            people.BuyProduct(product2, 7);
+            people.BuyProduct(product3, 5);
+            people.BuyProduct(product4, 10);
+        }
+    }
+
+    class Product
+    {
+        public string Name { get; private set; }
+
+        public Product(string name)
+        {
+            Name = name;
+        }
+    }
+
+    class People
+    {
+        public Dictionary<Product, int> basket = new Dictionary<Product, int>();
+
+        public Product GetProduct(string nameProduct)
         {
             foreach (var product in basket)
             {
-                Console.WriteLine($"1. {product.Name} - {product.Quantity} шт.");
-            }
-        }
-
-        class Seller
-        {
-            List<Product> _basket = new List<Product>();
-
-            public Seller()
-            {
-                AddProduct();
-            }
-
-            public void PrintBasket()
-            {
-                Console.WriteLine("В магазине в наличии следующие продукты:");
-                Print(_basket);
-                Console.WriteLine();
-            }
-
-            public bool IsProduct(string name, int quantity)
-            {
-                bool isProduct=false;
-                string nameProduct = name;
-                int quantityProduct = quantity;
-
-                foreach (var product in _basket)
+                if (product.Key.Name == nameProduct)
                 {
-                    if (product.Name == nameProduct && product.Quantity >= quantityProduct)
-                        isProduct = true;
-                }
-
-                return isProduct;
-            }
-
-            public void SellProduct(string name, int quantity)
-            {
-                string nameProduct = name;
-                int quantityProduct = quantity;
-
-                foreach (var product in _basket)
-                {
-                    if (product.Name == nameProduct)
-                        product.Sell(quantityProduct);
+                    return product.Key;
                 }
             }
 
-            private void AddProduct()
+            return new Product("");
+        }
+
+        public void BuyProduct(Product product, int quantity)
+        {
+            if (basket.ContainsKey(product))
+                basket[product] += quantity;
+            else
+                basket.Add(product, quantity);
+        }
+
+        public void SellProduct(Product product, int quantitySell)
+        {
+            basket[product] -= quantitySell;
+
+            if (basket[product] == 0)
+                basket.Remove(product);
+        }
+
+        public void Show()
+        {
+            foreach (var product in basket)
             {
-                _basket.Add(new Product("Огурцы", 7));
-                _basket.Add(new Product("Капуста", 20));
-                _basket.Add(new Product("Пельмени", 14));
-                _basket.Add(new Product("Колбаса", 3));
+                Console.WriteLine($"{product.Key.Name} - {product.Value} шт.");
             }
         }
 
-        class User
+        public bool IsProduct(Product product)
         {
-            List<Product> _basket = new List<Product>();
-
-            public void AddProduct(Seller seller)
+            if (!basket.ContainsKey(product))
             {
-                string name;
-                int quantity;
-
-                Console.Write("Введите название продукта: ");
-                name = Console.ReadLine();
-                Console.Write("Введите количество продукта: ");
-                quantity = Convert.ToInt32(Console.ReadLine());
-
-                if (seller.IsProduct(name, quantity))
-                {
-                    _basket.Add(new Product(name, quantity));
-                    seller.SellProduct(name,quantity);
-                }
-                else
-                    Console.WriteLine("Ошибка покупки: недостаточно продукта у продавца");
-
-                Console.Clear();
+                Console.WriteLine("Этого продукта нет в наличии! Нажмите лубую клавишу для продолжения...");
+                Console.ReadKey();
             }
-
-            public void PrintBasket()
-            {
-                Console.Clear();
-                Console.WriteLine("В вашей корзине находятся следующие продукты:");
-                Print(_basket);
-                Console.WriteLine();
-            }
+                
+            return basket.ContainsKey(product);
         }
 
-        class Product
+        public bool IsQuantityProduct(Product product, int quantity)
         {
-            public string Name { get; private set; }
-            public int Quantity { get; private set; }
-            public Product(string name, int quantity )
+            if (!(basket[product] >= quantity))
             {
-                Name = name;
-                Quantity = quantity;
+                Console.WriteLine("Такого количества продукта нет в наличии! Нажмите лубую клавишу для продолжения...");
+                Console.ReadKey();
             }
-
-            public void Sell(int quantity)
-            {
-                Quantity -= quantity;
-            }
+                
+            return basket[product] >= quantity;
         }
     }
 }
