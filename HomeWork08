@@ -84,31 +84,31 @@ namespace HomeWork1
 
     class Buyer
     {
-        protected Dictionary<Product, int> _basket;
+        protected Dictionary<Product, int> Basket;
         public Buyer()
         {
-            _basket = new Dictionary<Product, int>();
+            Basket = new Dictionary<Product, int>();
         }
 
         protected void BuyProduct(Product product, int quantity)
         {
-            if (_basket.ContainsKey(product))
-                _basket[product] += quantity;
+            if (Basket.ContainsKey(product))
+                Basket[product] += quantity;
             else
-                _basket.Add(product, quantity);
+                Basket.Add(product, quantity);
         }
 
         protected void SellProduct(Product product, int quantitySell)
         {
-            _basket[product] -= quantitySell;
+            Basket[product] -= quantitySell;
 
-            if (_basket[product] == 0)
-                _basket.Remove(product);
+            if (Basket[product] == 0)
+                Basket.Remove(product);
         }
 
         public void Show()
         {
-            foreach (var product in _basket)
+            foreach (var product in Basket)
             {
                 Console.WriteLine($"{product.Key.Name} - {product.Value} шт.");
             }
@@ -119,7 +119,7 @@ namespace HomeWork1
     {
         public Product GetProduct(string nameProduct)
         {
-            foreach (var product in _basket)
+            foreach (var product in Basket)
             {
                 if (product.Key.Name == nameProduct)
                 {
@@ -132,24 +132,24 @@ namespace HomeWork1
 
         public bool IsProductInStock(Product product)
         {
-            if (!_basket.ContainsKey(product))
+            if (!Basket.ContainsKey(product))
             {
                 Console.WriteLine("Этого продукта нет в наличии! Нажмите лубую клавишу для продолжения...");
                 Console.ReadKey();
             }
 
-            return _basket.ContainsKey(product);
+            return Basket.ContainsKey(product);
         }
 
         public bool IsQuantityOfProductInStock(Product product, int quantity)
         {
-            if (!(_basket[product] >= quantity))
+            if (!(Basket[product] >= quantity))
             {
                 Console.WriteLine("Такого количества продукта нет в наличии! Нажмите лубую клавишу для продолжения...");
                 Console.ReadKey();
             }
 
-            return _basket[product] >= quantity;
+            return Basket[product] >= quantity;
         }
 
         public void AcceptProduct(Product[] products)
