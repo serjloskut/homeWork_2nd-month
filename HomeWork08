@@ -94,11 +94,11 @@ namespace HomeWork1
 
     class People
     {
-        public Dictionary<Product, int> basket = new Dictionary<Product, int>();
+        private Dictionary<Product, int> _basket = new Dictionary<Product, int>();
 
         public Product GetProduct(string nameProduct)
         {
-            foreach (var product in basket)
+            foreach (var product in _basket)
             {
                 if (product.Key.Name == nameProduct)
                 {
@@ -111,23 +111,23 @@ namespace HomeWork1
 
         public void BuyProduct(Product product, int quantity)
         {
-            if (basket.ContainsKey(product))
-                basket[product] += quantity;
+            if (_basket.ContainsKey(product))
+                _basket[product] += quantity;
             else
-                basket.Add(product, quantity);
+                _basket.Add(product, quantity);
         }
 
         public void SellProduct(Product product, int quantitySell)
         {
-            basket[product] -= quantitySell;
+            _basket[product] -= quantitySell;
 
-            if (basket[product] == 0)
-                basket.Remove(product);
+            if (_basket[product] == 0)
+                _basket.Remove(product);
         }
 
         public void Show()
         {
-            foreach (var product in basket)
+            foreach (var product in _basket)
             {
                 Console.WriteLine($"{product.Key.Name} - {product.Value} шт.");
             }
@@ -135,24 +135,24 @@ namespace HomeWork1
 
         public bool IsProduct(Product product)
         {
-            if (!basket.ContainsKey(product))
+            if (!_basket.ContainsKey(product))
             {
                 Console.WriteLine("Этого продукта нет в наличии! Нажмите лубую клавишу для продолжения...");
                 Console.ReadKey();
             }
                 
-            return basket.ContainsKey(product);
+            return _basket.ContainsKey(product);
         }
 
         public bool IsQuantityProduct(Product product, int quantity)
         {
-            if (!(basket[product] >= quantity))
+            if (!(_basket[product] >= quantity))
             {
                 Console.WriteLine("Такого количества продукта нет в наличии! Нажмите лубую клавишу для продолжения...");
                 Console.ReadKey();
             }
                 
-            return basket[product] >= quantity;
+            return _basket[product] >= quantity;
         }
     }
 }
