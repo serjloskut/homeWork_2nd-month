@@ -11,15 +11,14 @@ namespace HomeWork1
     {
         static void Main(string[] args)
         {
-            People buyer = new People();
-            People seller = new People();
-            Product cucumber = new Product("Огурец");
-            Product banana = new Product("Банан");
-            Product cheese = new Product("Сыр");
-            Product chupaChups = new Product("Чупа-чупс");
+            Buyer buyer = new Buyer();
+            Seller seller = new Seller();
+            Magazine magazine = new Magazine();
+            Product[] products = { new Product("Огурец"), new Product("Банан"), new Product("Сыр"), new Product("Чупа-чупс") };
+
             bool isContinue = true;
 
-            AddProductSeller(seller, cucumber, banana, cheese, chupaChups);
+            seller.AcceptProduct(products);
 
             while (isContinue)
             {
@@ -40,17 +39,16 @@ namespace HomeWork1
                         Console.Write("Введите название продукта: ");
                         string userNameProduct = Console.ReadLine();
 
-                        if (!seller.IsProduct(seller.GetProduct(userNameProduct)))
+                        if (!seller.IsProductInStock(seller.GetProduct(userNameProduct)))
                             break;
 
                         Console.Write("Введите количество продукта: ");
                         int userCountProduct = Convert.ToInt32(Console.ReadLine());
 
-                        if (!seller.IsQuantityProduct(seller.GetProduct(userNameProduct), userCountProduct))
+                        if (!seller.IsQuantityOfProductInStock(seller.GetProduct(userNameProduct), userCountProduct))
                             break;
 
-                        buyer.BuyProduct(seller.GetProduct(userNameProduct), userCountProduct);
-                        seller.SellProduct(seller.GetProduct(userNameProduct), userCountProduct);
+                        magazine.MakeSale(seller, buyer, userNameProduct, userCountProduct);
 
                         Console.Write("Покупка успешно завершена. Нажмите любую клавишу для продолжения...");
                         Console.ReadKey();
@@ -72,14 +70,6 @@ namespace HomeWork1
                 Console.Clear();
             }
         }
-
-        static void AddProductSeller(People people, Product product1, Product product2, Product product3, Product product4)
-        {
-            people.BuyProduct(product1, 15);
-            people.BuyProduct(product2, 7);
-            people.BuyProduct(product3, 5);
-            people.BuyProduct(product4, 10);
-        }
     }
 
     class Product
@@ -92,24 +82,15 @@ namespace HomeWork1
         }
     }
 
-    class People
+    class Buyer
     {
-        private Dictionary<Product, int> _basket = new Dictionary<Product, int>();
-
-        public Product GetProduct(string nameProduct)
+        protected Dictionary<Product, int> _basket;
+        public Buyer()
         {
-            foreach (var product in _basket)
-            {
-                if (product.Key.Name == nameProduct)
-                {
-                    return product.Key;
-                }
-            }
-
-            return new Product("");
+            _basket = new Dictionary<Product, int>();
         }
 
-        public void BuyProduct(Product product, int quantity)
+        protected void BuyProduct(Product product, int quantity)
         {
             if (_basket.ContainsKey(product))
                 _basket[product] += quantity;
@@ -117,7 +98,7 @@ namespace HomeWork1
                 _basket.Add(product, quantity);
         }
 
-        public void SellProduct(Product product, int quantitySell)
+        protected void SellProduct(Product product, int quantitySell)
         {
             _basket[product] -= quantitySell;
 
@@ -132,27 +113,60 @@ namespace HomeWork1
                 Console.WriteLine($"{product.Key.Name} - {product.Value} шт.");
             }
         }
+    }
 
-        public bool IsProduct(Product product)
+    class Seller : Buyer
+    {
+        public Product GetProduct(string nameProduct)
+        {
+            foreach (var product in _basket)
+            {
+                if (product.Key.Name == nameProduct)
+                {
+                    return product.Key;
+                }
+            }
+
+            return null;
+        }
+
+        public bool IsProductInStock(Product product)
         {
             if (!_basket.ContainsKey(product))
             {
                 Console.WriteLine("Этого продукта нет в наличии! Нажмите лубую клавишу для продолжения...");
                 Console.ReadKey();
             }
-                
+
             return _basket.ContainsKey(product);
         }
 
-        public bool IsQuantityProduct(Product product, int quantity)
+        public bool IsQuantityOfProductInStock(Product product, int quantity)
         {
             if (!(_basket[product] >= quantity))
             {
                 Console.WriteLine("Такого количества продукта нет в наличии! Нажмите лубую клавишу для продолжения...");
                 Console.ReadKey();
             }
-                
+
             return _basket[product] >= quantity;
+        }
+
+        public void AcceptProduct(Product[] products)
+        {
+            Random random = new Random();
+
+            for (int i = 0; i < products.Length; i++)
+                BuyProduct(products[i], random.Next(10, 30));
+        }
+    }
+
+    class Magazine : Buyer
+    {
+        public void MakeSale(Seller seller, Buyer buyer, string userNameProduct, int userCountProduct)
+        {
+            BuyProduct(seller.GetProduct(userNameProduct), userCountProduct);
+            SellProduct(seller.GetProduct(userNameProduct), userCountProduct);
         }
     }
 }
