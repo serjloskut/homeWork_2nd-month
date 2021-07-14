@@ -4,169 +4,106 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
-
 namespace HomeWork1
 {
     class Program
     {
         static void Main(string[] args)
         {
-            Buyer buyer = new Buyer();
-            Seller seller = new Seller();
-            Magazine magazine = new Magazine();
-            Product[] products = { new Product("Огурец"), new Product("Банан"), new Product("Сыр"), new Product("Чупа-чупс") };
-
+            Random random = new Random();
+            int countTickets = 0;
+            int countSeats = 0;
+            Train train = new Train();
             bool isContinue = true;
-
-            seller.AcceptProduct(products);
 
             while (isContinue)
             {
-                Console.SetCursorPosition(0, 15);
-                Console.WriteLine("Товары в наличии:");
-                seller.Show();
+                if (train.IsSend)
+                    Console.WriteLine("Нет сформированных поездов\n");
+                else
+                    Console.WriteLine($"Формируется поезд направления {train.CityDeparture} - {train.CityArrival}. Продано: {countTickets}/{countSeats} билетов\n");
 
-                Console.SetCursorPosition(0, 0);
-                Console.WriteLine("Доступные действие:\n" +
-                    "1. Купить товар.\n" +
-                    "2. Показать свою корзину.\n" +
-                    "3. Выйти из магазина.\n");
-                Console.Write("Введите номер действия: ");
+                Console.WriteLine("Выберите необходимое действие:\n" +
+                    "1. Создать направление\n" +
+                    "2. Продать билеты\n" +
+                    "3. Сформировать поезд\n" +
+                    "4. ОТправить поезд");
 
-                switch (Console.ReadLine())
+                switch (Convert.ToInt32(Console.ReadLine()))
                 {
-                    case "1":
-                        Console.Write("Введите название продукта: ");
-                        string userNameProduct = Console.ReadLine();
-
-                        if (!seller.IsProductInStock(seller.GetProduct(userNameProduct)))
-                            break;
-
-                        Console.Write("Введите количество продукта: ");
-                        int userCountProduct = Convert.ToInt32(Console.ReadLine());
-
-                        if (!seller.IsQuantityOfProductInStock(seller.GetProduct(userNameProduct), userCountProduct))
-                            break;
-
-                        magazine.MakeSale(seller, buyer, userNameProduct, userCountProduct);
-
-                        Console.Write("Покупка успешно завершена. Нажмите любую клавишу для продолжения...");
-                        Console.ReadKey();
+                    case 1:
+                        train.CreateDirectionMovement();
                         break;
-                    case "2":
-                        buyer.Show();
-
-                        Console.Write("Нажмите любую клавишу для продолжения: ");
-                        Console.ReadKey();
+                    case 2:
+                        countTickets = random.Next(30, 52);
                         break;
-                    case "3":
-                        isContinue = false;
+                    case 3:
+                        countSeats = train.Form(countTickets);
+                        break;
+                    case 4:
+                        train.Send();
                         break;
                     default:
-                        Console.Write("Команда не распознана. Нажмите любую клавишу для повторного выбора...");
-                        Console.ReadKey();
+                        Console.WriteLine("Введена неверная команда.");
                         break;
                 }
+
                 Console.Clear();
             }
         }
-    }
 
-    class Product
-    {
-        public string Name { get; private set; }
-
-        public Product(string name)
+        class Train
         {
-            Name = name;
-        }
-    }
+            List<RailwayCarriage> _railwayCarriages = new List<RailwayCarriage>();
 
-    class Buyer
-    {
-        protected Dictionary<Product, int> Basket;
-        public Buyer()
-        {
-            Basket = new Dictionary<Product, int>();
-        }
+            public string CityDeparture { get; private set; }
+            public string CityArrival { get; private set; }
+            public bool IsSend { get; private set; }
 
-        protected void BuyProduct(Product product, int quantity)
-        {
-            if (Basket.ContainsKey(product))
-                Basket[product] += quantity;
-            else
-                Basket.Add(product, quantity);
-        }
-
-        protected void SellProduct(Product product, int quantitySell)
-        {
-            Basket[product] -= quantitySell;
-
-            if (Basket[product] == 0)
-                Basket.Remove(product);
-        }
-
-        public void Show()
-        {
-            foreach (var product in Basket)
+            public Train()
             {
-                Console.WriteLine($"{product.Key.Name} - {product.Value} шт.");
+                IsSend = true;
             }
-        }
-    }
 
-    class Seller : Buyer
-    {
-        public Product GetProduct(string nameProduct)
-        {
-            foreach (var product in Basket)
+            public void CreateDirectionMovement()
             {
-                if (product.Key.Name == nameProduct)
+                IsSend = false;
+                Console.Write("Введите город отправления: ");
+                CityDeparture = Console.ReadLine();
+                Console.Write("Введите город прибытия: ");
+                CityArrival = Console.ReadLine();
+            }
+            public int Form(int seats)
+            {
+                int sumSeat = 0;
+                int userCountSeat;
+
+                while (seats > sumSeat)
                 {
-                    return product.Key;
+                    Console.Write("Введите количество мест в вагоне: ");
+                    userCountSeat = Convert.ToInt32(Console.ReadLine());
+                    _railwayCarriages.Add(new RailwayCarriage(userCountSeat));
+                    sumSeat += userCountSeat;
+                    Console.WriteLine($"Занято {sumSeat} из {seats}\n");
                 }
+                return sumSeat;
             }
 
-            return null;
-        }
-
-        public bool IsProductInStock(Product product)
-        {
-            if (!Basket.ContainsKey(product))
+            public void Send()
             {
-                Console.WriteLine("Этого продукта нет в наличии! Нажмите лубую клавишу для продолжения...");
+                Console.WriteLine("Поезд отправлен!\nНажмите любую клавишу для продолжения.");
                 Console.ReadKey();
+                IsSend = true;
             }
-
-            return Basket.ContainsKey(product);
         }
 
-        public bool IsQuantityOfProductInStock(Product product, int quantity)
+        class RailwayCarriage
         {
-            if (!(Basket[product] >= quantity))
+            public int CountSeat { get; private set; }
+            public RailwayCarriage(int count)
             {
-                Console.WriteLine("Такого количества продукта нет в наличии! Нажмите лубую клавишу для продолжения...");
-                Console.ReadKey();
+                CountSeat = count;
             }
-
-            return Basket[product] >= quantity;
-        }
-
-        public void AcceptProduct(Product[] products)
-        {
-            Random random = new Random();
-
-            for (int i = 0; i < products.Length; i++)
-                BuyProduct(products[i], random.Next(10, 30));
-        }
-    }
-
-    class Magazine : Buyer
-    {
-        public void MakeSale(Seller seller, Buyer buyer, string userNameProduct, int userCountProduct)
-        {
-            BuyProduct(seller.GetProduct(userNameProduct), userCountProduct);
-            SellProduct(seller.GetProduct(userNameProduct), userCountProduct);
         }
     }
 }
