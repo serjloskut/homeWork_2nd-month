@@ -23,7 +23,7 @@ namespace HomeWork1
             {
                 Console.SetCursorPosition(0, 15);
                 Console.WriteLine("Товары в наличии:");
-                seller.PrintProducts();
+                seller.PrintProducts(seller.GetProducts());
 
                 Console.SetCursorPosition(0, 0);
                 Console.WriteLine("Доступные действие:\n" +
@@ -53,7 +53,7 @@ namespace HomeWork1
                     case "2":
                         Console.WriteLine("\nВ Вашей корзине лежат следующие продукты:");
 
-                        user.PrintProducts();
+                        user.PrintProducts(user.GetProducts());
 
                         Console.Write("Нажмите любую клавишу для продолжения...");
                         Console.ReadKey();
@@ -71,6 +71,24 @@ namespace HomeWork1
         }
     }
 
+    class People
+    {
+        protected List<Product> Products;
+
+        public void PrintProducts(List<Product> products)
+        {
+            foreach (var product in products)
+            {
+                Console.WriteLine(product.Name);
+            }
+        }
+
+        public List<Product> GetProducts()
+        {
+            return Products;
+        }
+    }
+
     class Product
     {
         public string Name { get; private set; }
@@ -81,57 +99,39 @@ namespace HomeWork1
         }
     }
 
-    class User
+    class User : People
     {
-
-        private List<Product> _products;
-
         public User()
         {
-            _products = new List<Product>();
+            Products = new List<Product>();
         }
 
         public void BuyProduct(Product product)
         {
-            _products.Add(product);
+            Products.Add(product);
             Console.WriteLine("Вы приобрели продукт.\nНажмите любую клавишу для продолжения...");
             Console.ReadKey();
         }
-
-        public void PrintProducts()
-        {
-            foreach (var product in _products)
-            {
-                Console.WriteLine(product.Name);
-            }
-        }
     }
 
-    class Seller
+    class Seller : People
     {
-        private List<Product> _products;
-
         public Seller()
         {
-            _products = new List<Product>();
-        }
-
-        public List<Product> GetProducts()
-        {
-            return _products;
+            Products = new List<Product>();
         }
 
         public void AcceptProduct(Product[] products)
         {
             for (int i = 0; i < products.Length; i++)
-                _products.Add(products[i]);
+                Products.Add(products[i]);
         }
 
         public bool IsProductInStock(string checkProduct)
         {
             bool isCheck = false;
 
-            foreach (var product in _products)
+            foreach (var product in Products)
             {
                 if (product.Name == checkProduct)
                     isCheck = true;
@@ -145,25 +145,17 @@ namespace HomeWork1
             Product product = null;
             if (IsProductInStock(sellProduct))
             {
-                for (int i = 0; i < _products.Count; i++)
+                for (int i = 0; i < Products.Count; i++)
                 {
-                    if (_products[i].Name == sellProduct)
+                    if (Products[i].Name == sellProduct)
                     {
-                        product = _products[i];
-                        _products.RemoveAt(i);
+                        product = Products[i];
+                        Products.RemoveAt(i);
                         break;
                     }
                 }
             }
             return product;
-        }
-
-        public void PrintProducts()
-        {
-            foreach (var product in _products)
-            {
-                Console.WriteLine(product.Name);
-            }
         }
     }
 }
