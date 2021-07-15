@@ -75,6 +75,11 @@ namespace HomeWork1
     {
         protected List<Product> Products;
 
+        public People()
+        {
+            Products = new List<Product>();
+        }
+
         public void PrintProducts()
         {
             foreach (var product in Products)
@@ -96,11 +101,6 @@ namespace HomeWork1
 
     class User : People
     {
-        public User()
-        {
-            Products = new List<Product>();
-        }
-
         public void BuyProduct(Product product)
         {
             Products.Add(product);
@@ -111,11 +111,6 @@ namespace HomeWork1
 
     class Seller : People
     {
-        public Seller()
-        {
-            Products = new List<Product>();
-        }
-
         public void AcceptProduct(Product[] products)
         {
             for (int i = 0; i < products.Length; i++)
@@ -129,7 +124,10 @@ namespace HomeWork1
             foreach (var product in Products)
             {
                 if (product.Name == checkProduct)
+                {
                     isCheck = true;
+                    break;
+                }
             }
 
             return isCheck;
