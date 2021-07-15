@@ -132,6 +132,8 @@ namespace HomeWork1
 
     class FigtherClanBoxer : Warrior
     {
+        private Random _random = new Random();
+
         public FigtherClanBoxer(int health, int armor, int damage) : base(health, armor, damage)
         {
             TypeClan = "Боец клана \"Боксеры\"";
@@ -139,9 +141,7 @@ namespace HomeWork1
 
         public override void UseSpecialSkill()
         {
-            Random random = new Random();
-
-            Damage += (Damage / random.Next(5,15));
+            Damage += (Damage / _random.Next(5,15));
         }
     }
 }
