@@ -37,21 +37,11 @@ namespace HomeWork1
                     case "1":
                         Console.Write("\nВведите название продукта: ");
 
-                        if (user.BuyProduct(new Product(Console.ReadLine()), seller))
-                        {
-                            
-                            Console.WriteLine("Вы приобрели продукт.\nНажмите любую клавишу для продолжения...");
-                            Console.ReadKey();
-                        }
-                        else
-                        {
-                            Console.WriteLine("У продавца такой товар отсутствует. Покупка не удалась.\nНажмите любую клавишу для продолжения...");
-                            Console.ReadKey();
-                        }
-
+                        user.BuyProduct(new Product(Console.ReadLine()), seller);
                         break;
                     case "2":
                         Console.WriteLine("\nВ Вашей корзине лежат следующие продукты:");
+
                         PrintProducts(user.Products);
 
                         Console.Write("Нажмите любую клавишу для продолжения...");
@@ -82,7 +72,7 @@ namespace HomeWork1
     {
         public string Name { get; private set; }
 
-        public Product (string name)
+        public Product(string name)
         {
             Name = name;
         }
@@ -90,30 +80,34 @@ namespace HomeWork1
 
     class User
     {
-        public List<Product> Products;
+        public List<Product> Products { get; private set; }
+
         public User()
         {
             Products = new List<Product>();
         }
 
-        public bool BuyProduct(Product product, Seller seller)
+        public void BuyProduct(Product product, Seller seller)
         {
-            bool isBuy = false;
-
             if (seller.CheckProduct(product))
             {
                 Products.Add(product);
                 seller.SellProduct(product);
-                isBuy = true;
+                Console.WriteLine("Вы приобрели продукт.\nНажмите любую клавишу для продолжения...");
+                Console.ReadKey();
             }
-
-            return isBuy;
+            else
+            {
+                Console.WriteLine("У продавца такой товар отсутствует. Покупка не удалась.\nНажмите любую клавишу для продолжения...");
+                Console.ReadKey();
+            }
         }
     }
 
     class Seller
     {
-        public List<Product> Products;
+        public List<Product> Products { get; private set; }
+
         public Seller()
         {
             Products = new List<Product>();
@@ -121,8 +115,6 @@ namespace HomeWork1
 
         public void AcceptProduct(Product[] products)
         {
-            Random random = new Random();
-
             for (int i = 0; i < products.Length; i++)
                 Products.Add(products[i]);
         }
