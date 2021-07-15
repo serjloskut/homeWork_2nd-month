@@ -1,0 +1,45 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.IO;
+
+namespace HomeWork1
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+
+        }
+    }
+
+    class Warrior
+    {
+        public int Health;
+        public int Armor;
+        public int Damage;
+        public Warrior(int health, int armor, int damage)
+        {
+            Health = health;
+            Armor = armor;
+            Damage = damage;
+        }
+        public void TakeDamage(int damage)
+        {
+            if (Armor <= damage)
+                Health = Health - (damage - Armor);
+        }
+    }
+
+    class FigtherClanHead : Warrior
+    {
+        public FigtherClanHead(int health, int armor, int damage)
+        {
+            Health = health;
+            Armor = armor;
+            Damage = damage;
+        }
+    }
+}
