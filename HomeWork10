@@ -11,35 +11,103 @@ namespace HomeWork1
     {
         static void Main(string[] args)
         {
+            bool isContinue = true;
+
+            Warrior[] warriors = { new FigtherClanHead(100, 30, 40, 50), new FigtherClanLeg(90, 30, 30, 50), new FigtherClanShoulder(200, 20, 15, 60), new FigtherClanHead(150, 20, 40, 50), new FigtherClanLeg(150, 150, 30, 50) };
+
+            Console.WriteLine("Доступные бойцы:");
+            for (int i = 0; i < warriors.Length; i++)
+            {
+                Console.Write($"{i+1} - ");
+                warriors[i].PrintStats();
+            }
+
+            
+            Console.WriteLine(warriors[0].GetTypeClan());
+            Console.ReadKey();
+
+
 
         }
     }
 
     class Warrior
     {
-        public int Health;
-        public int Armor;
-        public int Damage;
+        protected int Health;
+        protected int Armor;
+        protected int Damage;
+
+        protected string TypeClan;
+
         public Warrior(int health, int armor, int damage)
         {
             Health = health;
             Armor = armor;
             Damage = damage;
         }
+
         public void TakeDamage(int damage)
         {
             if (Armor <= damage)
-                Health = Health - (damage - Armor);
+                Health -= (damage - Armor);
         }
+
+        public void PrintStats()
+        {
+            Console.WriteLine($"Healh - {Health}; Armor - {Armor}; Damage - {Damage}");
+        }
+
+        public string GetTypeClan()
+        {
+            return TypeClan;
+        }
+
+        public virtual void Strike() { }
     }
 
     class FigtherClanHead : Warrior
     {
-        public FigtherClanHead(int health, int armor, int damage)
+        public int SuperDamageHead;
+
+        public FigtherClanHead(int health, int armor, int damage, int superDamageHead) : base(health, armor, damage)
         {
-            Health = health;
-            Armor = armor;
-            Damage = damage;
+            SuperDamageHead = superDamageHead;
+            TypeClan = "Боец клана \"Головастых\"";
+        }
+
+        public override void Strike()
+        {
+
+        }
+    }
+    class FigtherClanShoulder : Warrior
+    {
+        public int SuperDamageShoulder;
+
+        public FigtherClanShoulder(int health, int armor, int damage, int superDamageShoulder) : base(health, armor, damage)
+        {
+            SuperDamageShoulder = superDamageShoulder;
+        }
+
+        public void TakeSuperDamage(int superDamageShoulder)
+        {
+            if (Armor <= superDamageShoulder)
+                Health -= (superDamageShoulder - Armor);
+        }
+    }
+    class FigtherClanLeg : Warrior
+    {
+        public int SuperDamageLeg;
+
+        public FigtherClanLeg(int health, int armor, int damage, int superDamageLeg) : base(health, armor, damage)
+        {
+            SuperDamageLeg = superDamageLeg;
+        }
+
+        public void TakeSuperDamage(int superDamageLeg)
+        {
+            if (Armor <= superDamageLeg)
+                Health -= (superDamageLeg - Armor);
         }
     }
 }
