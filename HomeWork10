@@ -11,23 +11,48 @@ namespace HomeWork1
     {
         static void Main(string[] args)
         {
-            bool isContinue = true;
-
-            Warrior[] warriors = { new FigtherClanHead(100, 30, 40, 50), new FigtherClanLeg(90, 30, 30, 50), new FigtherClanShoulder(200, 20, 15, 60), new FigtherClanHead(150, 20, 40, 50), new FigtherClanLeg(150, 150, 30, 50) };
+            Warrior[] warriors =
+            {
+                new FigtherClanHead(100, 30, 40),
+                new FigtherClanBoxer(90, 30, 30),
+                new FigtherClanShoulder(200, 20, 15),
+                new FigtherClanHead(150, 20, 40),
+                new FigtherClanBoxer(150, 150, 30)
+            };
 
             Console.WriteLine("Доступные бойцы:");
             for (int i = 0; i < warriors.Length; i++)
             {
-                Console.Write($"{i+1} - ");
+                Console.Write($"{i + 1} - ");
                 warriors[i].PrintStats();
             }
 
-            
-            Console.WriteLine(warriors[0].GetTypeClan());
+            Console.Write("Выберите первого игрока: ");
+            Warrior figterOne = warriors[Convert.ToInt32(Console.ReadLine()) - 1];
+
+            Console.Write("Выберите Второго игрока: ");
+            Warrior figterTwo = warriors[Convert.ToInt32(Console.ReadLine()) - 1];
+
+            while (figterOne.GetHealth()>0 && figterTwo.GetHealth()>0)
+            {
+                figterOne.TakeDamage(figterTwo.GetDamage());
+                figterOne.UseSpecialSkill();
+                figterTwo.TakeDamage(figterOne.GetDamage());
+                figterTwo.UseSpecialSkill();
+
+                figterOne.PrintStats();
+                figterTwo.PrintStats();
+                Console.WriteLine();
+            }
+
+            if (figterOne.GetHealth() <= 0 && figterTwo.GetHealth() <= 0)
+                Console.WriteLine("Бой закончился ничьей!");
+            else if(figterOne.GetHealth()<=0)
+                Console.WriteLine("Победил второй игрок!");
+            else if(figterTwo.GetHealth() <= 0)
+                Console.WriteLine("Победил первый игрок!");
+
             Console.ReadKey();
-
-
-
         }
     }
 
@@ -46,6 +71,16 @@ namespace HomeWork1
             Damage = damage;
         }
 
+        public int GetHealth()
+        {
+            return Health;
+        }
+
+        public int GetDamage()
+        {
+            return Damage;
+        }
+
         public void TakeDamage(int damage)
         {
             if (Armor <= damage)
@@ -62,52 +97,51 @@ namespace HomeWork1
             return TypeClan;
         }
 
-        public virtual void Strike() { }
+        public virtual void UseSpecialSkill()
+        {
+            
+        }
     }
 
     class FigtherClanHead : Warrior
     {
-        public int SuperDamageHead;
-
-        public FigtherClanHead(int health, int armor, int damage, int superDamageHead) : base(health, armor, damage)
+        public FigtherClanHead(int health, int armor, int damage) : base(health, armor, damage)
         {
-            SuperDamageHead = superDamageHead;
             TypeClan = "Боец клана \"Головастых\"";
         }
 
-        public override void Strike()
+        public override void UseSpecialSkill()
         {
-
+            Health += 1;
         }
     }
+
     class FigtherClanShoulder : Warrior
     {
-        public int SuperDamageShoulder;
-
-        public FigtherClanShoulder(int health, int armor, int damage, int superDamageShoulder) : base(health, armor, damage)
+        public FigtherClanShoulder(int health, int armor, int damage) : base(health, armor, damage)
         {
-            SuperDamageShoulder = superDamageShoulder;
+            TypeClan = "Боец клана \"Волосатых\"";
         }
 
-        public void TakeSuperDamage(int superDamageShoulder)
+        public override void UseSpecialSkill()
         {
-            if (Armor <= superDamageShoulder)
-                Health -= (superDamageShoulder - Armor);
+            Health += 20;
+            Armor -= 5;
         }
     }
-    class FigtherClanLeg : Warrior
-    {
-        public int SuperDamageLeg;
 
-        public FigtherClanLeg(int health, int armor, int damage, int superDamageLeg) : base(health, armor, damage)
+    class FigtherClanBoxer : Warrior
+    {
+        public FigtherClanBoxer(int health, int armor, int damage) : base(health, armor, damage)
         {
-            SuperDamageLeg = superDamageLeg;
+            TypeClan = "Боец клана \"Боксеры\"";
         }
 
-        public void TakeSuperDamage(int superDamageLeg)
+        public override void UseSpecialSkill()
         {
-            if (Armor <= superDamageLeg)
-                Health -= (superDamageLeg - Armor);
+            Random random = new Random();
+
+            Damage += (Damage / random.Next(5,15));
         }
     }
 }
