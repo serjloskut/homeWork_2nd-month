@@ -13,7 +13,7 @@ namespace HomeWork1
         {
             User user = new User();
             Seller seller = new Seller();
-            Product[] productsForAccept = { new Product("Огурец"), new Product("Помидор"), new Product("Укроп"), new Product("Майонез") };
+            Product[] productsForAccept = { new Product("Огурец"), new Product("Помидор"), new Product("Огурец"), new Product("Майонез") };
 
             bool isContinue = true;
 
@@ -23,7 +23,7 @@ namespace HomeWork1
             {
                 Console.SetCursorPosition(0, 15);
                 Console.WriteLine("Товары в наличии:");
-                PrintProducts(seller.Products);
+                seller.PrintProducts();
 
                 Console.SetCursorPosition(0, 0);
                 Console.WriteLine("Доступные действие:\n" +
@@ -36,13 +36,24 @@ namespace HomeWork1
                 {
                     case "1":
                         Console.Write("\nВведите название продукта: ");
+                        string userProduct = Console.ReadLine();
 
-                        user.BuyProduct(new Product(Console.ReadLine()), seller);
+                        Product forSale = seller.SellProduct(userProduct);
+
+                        if (forSale == null)
+                        {
+                            Console.WriteLine("У продавца такой товар отсутствует. Покупка не удалась.\nНажмите любую клавишу для продолжения...");
+                            Console.ReadKey();
+                        }
+                        else
+                        {
+                            user.BuyProduct(forSale);
+                        }
                         break;
                     case "2":
                         Console.WriteLine("\nВ Вашей корзине лежат следующие продукты:");
 
-                        PrintProducts(user.Products);
+                        user.PrintProducts();
 
                         Console.Write("Нажмите любую клавишу для продолжения...");
                         Console.ReadKey();
@@ -56,14 +67,6 @@ namespace HomeWork1
                         break;
                 }
                 Console.Clear();
-            }
-        }
-
-        static void PrintProducts(List<Product> products)
-        {
-            foreach (var product in products)
-            {
-                Console.WriteLine(product.Name);
             }
         }
     }
@@ -80,64 +83,86 @@ namespace HomeWork1
 
     class User
     {
-        public List<Product> Products { get; private set; }
+
+        private List<Product> _products;
 
         public User()
         {
-            Products = new List<Product>();
+            _products = new List<Product>();
         }
 
-        public void BuyProduct(Product product, Seller seller)
+        public void BuyProduct(Product product)
         {
-            if (seller.CheckProduct(product))
+            _products.Add(product);
+            Console.WriteLine("Вы приобрели продукт.\nНажмите любую клавишу для продолжения...");
+            Console.ReadKey();
+        }
+
+        public void PrintProducts()
+        {
+            foreach (var product in _products)
             {
-                Products.Add(product);
-                seller.SellProduct(product);
-                Console.WriteLine("Вы приобрели продукт.\nНажмите любую клавишу для продолжения...");
-                Console.ReadKey();
-            }
-            else
-            {
-                Console.WriteLine("У продавца такой товар отсутствует. Покупка не удалась.\nНажмите любую клавишу для продолжения...");
-                Console.ReadKey();
+                Console.WriteLine(product.Name);
             }
         }
     }
 
     class Seller
     {
-        public List<Product> Products { get; private set; }
+        private List<Product> _products;
 
         public Seller()
         {
-            Products = new List<Product>();
+            _products = new List<Product>();
+        }
+
+        public List<Product> GetProducts()
+        {
+            return _products;
         }
 
         public void AcceptProduct(Product[] products)
         {
             for (int i = 0; i < products.Length; i++)
-                Products.Add(products[i]);
+                _products.Add(products[i]);
         }
 
-        public bool CheckProduct(Product checkProduct)
+        public bool IsProductInStock(string checkProduct)
         {
             bool isCheck = false;
 
-            foreach (var product in Products)
+            foreach (var product in _products)
             {
-                if (product.Name == checkProduct.Name)
+                if (product.Name == checkProduct)
                     isCheck = true;
             }
 
             return isCheck;
         }
 
-        public void SellProduct(Product sellProduct)
+        public Product SellProduct(string sellProduct)
         {
-            for (int i = 0; i < Products.Count; i++)
+            Product product = null;
+            if (IsProductInStock(sellProduct))
             {
-                if (Products[i].Name == sellProduct.Name)
-                    Products.Remove(Products[i]);
+                for (int i = 0; i < _products.Count; i++)
+                {
+                    if (_products[i].Name == sellProduct)
+                    {
+                        product = _products[i];
+                        _products.RemoveAt(i);
+                        break;
+                    }
+                }
+            }
+            return product;
+        }
+
+        public void PrintProducts()
+        {
+            foreach (var product in _products)
+            {
+                Console.WriteLine(product.Name);
             }
         }
     }
