@@ -23,7 +23,7 @@ namespace HomeWork1
             {
                 Console.SetCursorPosition(0, 15);
                 Console.WriteLine("Товары в наличии:");
-                seller.PrintProducts(seller.GetProducts());
+                seller.PrintProducts();
 
                 Console.SetCursorPosition(0, 0);
                 Console.WriteLine("Доступные действие:\n" +
@@ -53,7 +53,7 @@ namespace HomeWork1
                     case "2":
                         Console.WriteLine("\nВ Вашей корзине лежат следующие продукты:");
 
-                        user.PrintProducts(user.GetProducts());
+                        user.PrintProducts();
 
                         Console.Write("Нажмите любую клавишу для продолжения...");
                         Console.ReadKey();
@@ -75,17 +75,12 @@ namespace HomeWork1
     {
         protected List<Product> Products;
 
-        public void PrintProducts(List<Product> products)
+        public void PrintProducts()
         {
-            foreach (var product in products)
+            foreach (var product in Products)
             {
                 Console.WriteLine(product.Name);
             }
-        }
-
-        public List<Product> GetProducts()
-        {
-            return Products;
         }
     }
 
