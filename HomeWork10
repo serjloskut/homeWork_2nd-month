@@ -20,6 +20,8 @@ namespace HomeWork1
                 new FigtherClanBoxer(150, 150, 30)
             };
 
+            Random random = new Random();
+
             Console.WriteLine("Доступные бойцы:");
             for (int i = 0; i < warriors.Length; i++)
             {
@@ -28,17 +30,17 @@ namespace HomeWork1
             }
 
             Console.Write("Выберите первого игрока: ");
-            Warrior figterOne = warriors[Convert.ToInt32(Console.ReadLine()) - 1];
+            Warrior figterOne = warriors[(TryParseNumber() - 1)];
 
             Console.Write("Выберите Второго игрока: ");
-            Warrior figterTwo = warriors[Convert.ToInt32(Console.ReadLine()) - 1];
+            Warrior figterTwo = warriors[TryParseNumber() - 1];
 
             while (figterOne.GetHealth()>0 && figterTwo.GetHealth()>0)
             {
                 figterOne.TakeDamage(figterTwo.GetDamage());
-                figterOne.UseSpecialSkill();
+                figterOne.UseSpecialSkill(random.Next(50,150));
                 figterTwo.TakeDamage(figterOne.GetDamage());
-                figterTwo.UseSpecialSkill();
+                figterTwo.UseSpecialSkill(random.Next(50, 150));
 
                 figterOne.PrintStats();
                 figterTwo.PrintStats();
@@ -53,6 +55,18 @@ namespace HomeWork1
                 Console.WriteLine("Победил первый игрок!");
 
             Console.ReadKey();
+        }
+
+        static int TryParseNumber()
+        {
+            int resultParse;
+
+            while (!int.TryParse(Console.ReadLine(), out resultParse))
+            {
+                Console.Write("Неверный выбор! Повпробуйте ввести еще раз: ");
+            }
+
+            return resultParse;
         }
     }
 
@@ -97,7 +111,7 @@ namespace HomeWork1
             return TypeClan;
         }
 
-        public virtual void UseSpecialSkill()
+        public virtual void UseSpecialSkill(int random)
         {
             
         }
@@ -110,9 +124,9 @@ namespace HomeWork1
             TypeClan = "Боец клана \"Головастых\"";
         }
 
-        public override void UseSpecialSkill()
+        public override void UseSpecialSkill(int random)
         {
-            Health += 1;
+            Health += (random/80);
         }
     }
 
@@ -123,25 +137,23 @@ namespace HomeWork1
             TypeClan = "Боец клана \"Волосатых\"";
         }
 
-        public override void UseSpecialSkill()
+        public override void UseSpecialSkill(int random)
         {
-            Health += 20;
-            Armor -= 5;
+            Health += (random/7);
+            Armor -= (random/15);
         }
     }
 
     class FigtherClanBoxer : Warrior
     {
-        private Random _random = new Random();
-
         public FigtherClanBoxer(int health, int armor, int damage) : base(health, armor, damage)
         {
             TypeClan = "Боец клана \"Боксеры\"";
         }
 
-        public override void UseSpecialSkill()
+        public override void UseSpecialSkill(int random)
         {
-            Damage += (Damage / _random.Next(5,15));
+            Damage += (Damage / (random/10));
         }
     }
 }
