@@ -19,45 +19,28 @@ namespace HomeWork1
                 new FigtherClanHead(150, 20, 40),
                 new FigtherClanBoxer(150, 150, 30)
             };
-
+            Arena arena = new Arena();
             Random random = new Random();
 
-            Console.WriteLine("Доступные бойцы:");
-            for (int i = 0; i < warriors.Length; i++)
-            {
-                Console.Write($"{i + 1} - ");
-                warriors[i].PrintStats();
-            }
+            arena.Work(warriors, random);
+        }
+    }
 
-            Console.Write("Выберите первого игрока: ");
-            Warrior figterOne = warriors[(TryParseNumber() - 1)];
+    class Arena
+    {
+        private Warrior fighterOne;
+        private Warrior fighterTwo;
 
-            Console.Write("Выберите Второго игрока: ");
-            Warrior figterTwo = warriors[TryParseNumber() - 1];
-
-            while (figterOne.GetHealth()>0 && figterTwo.GetHealth()>0)
-            {
-                figterOne.TakeDamage(figterTwo.GetDamage());
-                figterOne.UseSpecialSkill(random.Next(50,150));
-                figterTwo.TakeDamage(figterOne.GetDamage());
-                figterTwo.UseSpecialSkill(random.Next(50, 150));
-
-                figterOne.PrintStats();
-                figterTwo.PrintStats();
-                Console.WriteLine();
-            }
-
-            if (figterOne.GetHealth() <= 0 && figterTwo.GetHealth() <= 0)
-                Console.WriteLine("Бой закончился ничьей!");
-            else if(figterOne.GetHealth()<=0)
-                Console.WriteLine("Победил второй игрок!");
-            else if(figterTwo.GetHealth() <= 0)
-                Console.WriteLine("Победил первый игрок!");
+        public void Work(Warrior[] warriors, Random random)
+        {
+            SelectFighters(warriors);
+            Fight(random);
+            ShowResult();
 
             Console.ReadKey();
         }
 
-        static int TryParseNumber()
+        private int TryParseNumber()
         {
             int resultParse;
 
@@ -68,15 +51,70 @@ namespace HomeWork1
 
             return resultParse;
         }
+
+        private void SelectFighters(Warrior[] warriors)
+        {
+            int userSelectOne = 0;
+            int userSelectTwo = 0;
+
+            while (userSelectOne == userSelectTwo)
+            {
+                Console.WriteLine("Доступные бойцы:");
+                for (int i = 0; i < warriors.Length; i++)
+                {
+                    Console.Write($"{i + 1} - ");
+                    warriors[i].PrintStats();
+                }
+
+                Console.Write("Выберите первого игрока: ");
+                userSelectOne = TryParseNumber() - 1;
+                Console.Write("Выберите Второго игрока: ");
+                userSelectTwo = TryParseNumber() - 1;
+
+                if (userSelectOne == userSelectTwo)
+                {
+                    Console.WriteLine("Вы выбрали одинаковых бойцов! Нажмите любую клавишу и начните выбор сначала....");
+                    Console.ReadKey();
+                    Console.Clear();
+                }
+            }
+
+            fighterOne = warriors[userSelectOne];
+            fighterTwo = warriors[userSelectTwo];
+        }
+
+        private void Fight(Random random)
+        {
+            while (fighterOne.Health > 0 && fighterTwo.Health > 0)
+            {
+                fighterOne.TakeDamage(fighterTwo);
+                fighterOne.UseSpecialSkill(random.Next(50, 150));
+                fighterTwo.TakeDamage(fighterOne);
+                fighterTwo.UseSpecialSkill(random.Next(50, 150));
+
+                fighterOne.PrintStats();
+                fighterTwo.PrintStats();
+                Console.WriteLine();
+            }
+        }
+
+        private void ShowResult()
+        {
+            if (fighterOne.Health <= 0 && fighterTwo.Health <= 0)
+                Console.WriteLine("Бой закончился ничьей!");
+            else if (fighterOne.Health <= 0)
+                Console.WriteLine("Победил второй игрок!");
+            else if (fighterTwo.Health <= 0)
+                Console.WriteLine("Победил первый игрок!");
+        }
     }
 
-    class Warrior
+    abstract class Warrior
     {
-        protected int Health;
-        protected int Armor;
-        protected int Damage;
-
-        protected string TypeClan;
+        public int Health { get; private set; }
+        public int Armor { get; private set; }
+        public int Damage { get; private set; }
+        public string TypeClan { get; private set; }
 
         public Warrior(int health, int armor, int damage)
         {
@@ -85,20 +123,10 @@ namespace HomeWork1
             Damage = damage;
         }
 
-        public int GetHealth()
+        public void TakeDamage(Warrior warrior)
         {
-            return Health;
-        }
-
-        public int GetDamage()
-        {
-            return Damage;
-        }
-
-        public void TakeDamage(int damage)
-        {
-            if (Armor <= damage)
-                Health -= (damage - Armor);
+            if (Armor <= warrior.Damage)
+                Health -= (warrior.Damage - Armor);
         }
 
         public void PrintStats()
@@ -106,27 +134,39 @@ namespace HomeWork1
             Console.WriteLine($"Healh - {Health}; Armor - {Armor}; Damage - {Damage}");
         }
 
-        public string GetTypeClan()
+        protected void SetTypeClan(string typeClan)
         {
-            return TypeClan;
+            TypeClan = typeClan;
         }
 
-        public virtual void UseSpecialSkill(int random)
+        protected void ChangeDamage(int factor)
         {
-            
+            Damage += Damage / factor;
         }
+
+        protected void ChangeHealth(int health)
+        {
+            Health += health;
+        }
+
+        protected void ChangeArmor(int armor)
+        {
+            Armor += armor;
+        }
+
+        public abstract void UseSpecialSkill(int random);
     }
 
     class FigtherClanHead : Warrior
     {
         public FigtherClanHead(int health, int armor, int damage) : base(health, armor, damage)
         {
-            TypeClan = "Боец клана \"Головастых\"";
+            SetTypeClan("Боец клана \"Головастых\"");
         }
 
         public override void UseSpecialSkill(int random)
         {
-            Health += (random/80);
+            ChangeHealth(random / 80);
         }
     }
 
@@ -134,13 +174,13 @@ namespace HomeWork1
     {
         public FigtherClanShoulder(int health, int armor, int damage) : base(health, armor, damage)
         {
-            TypeClan = "Боец клана \"Волосатых\"";
+            SetTypeClan("Боец клана \"Волосатых\"");
         }
 
         public override void UseSpecialSkill(int random)
         {
-            Health += (random/7);
-            Armor -= (random/15);
+            ChangeHealth(random / 7);
+            ChangeArmor(-random / 15);
         }
     }
 
@@ -148,12 +188,12 @@ namespace HomeWork1
     {
         public FigtherClanBoxer(int health, int armor, int damage) : base(health, armor, damage)
         {
-            TypeClan = "Боец клана \"Боксеры\"";
+            SetTypeClan("Боец клана \"Боксеры\"");
         }
 
         public override void UseSpecialSkill(int random)
         {
-            Damage += (Damage / (random/10));
+            ChangeDamage(random / 10);
         }
     }
 }
