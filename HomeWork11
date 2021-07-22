@@ -19,39 +19,29 @@ namespace HomeWork1
     class Shop
     {
         private Queue<Client> _clients = new Queue<Client>();
-        private int _balance=0;
-        private Random _random = new Random();
+        private int _balance = 0;
+        public Random _random = new Random();
 
         public Shop(int clientsCount)
         {
             CreateQueue(clientsCount);
         }
 
-        public void CreateQueue(int clientCount)
-        {
-            for (int i = 0; i < clientCount; i++)
-            {
-                CreateNewClient();
-            }
-        }
-
-        public void CreateNewClient()
-        {
-            _clients.Enqueue(new Client(_random));
-        }
-
         public void Work()
         {
-            Random random = new Random();
+            int purchaseAmount;
+            int timeWait = _random.Next(1, 3) * 1000;
 
-            while (_clients.Count>0)
+            while (_clients.Count > 0)
             {
                 Console.WriteLine($"Выручка магазина составляет: {_balance} рублей.\nВ очереди {_clients.Count} человек\nНажмите любую клавишу, чтобы обслужить следующего покупателя...");
                 Console.ReadKey();
+
                 Client client = _clients.Dequeue();
-                int purchaseAmount = client.CalculatePurchaseAmount();
+                purchaseAmount = client.CalculatePurchaseAmount();
+
                 Console.WriteLine($"\nКлиент хочет купить продуктов на сумму {purchaseAmount} рублей. Ждем, пока покупатель посчитает деньги...");
-                System.Threading.Thread.Sleep(random.Next(1,3)*1000);
+                System.Threading.Thread.Sleep(timeWait);
 
                 if (client.CheckSolvency())
                 {
@@ -60,13 +50,29 @@ namespace HomeWork1
                 }
                 else
                 {
-                    Console.WriteLine($"У клиента не хватило денег для оплаты. Он убрал из корзины {client.RemoveProductFromBasket(random)} товара. Цена покупки составила {client.CalculatePurchaseAmount()} рублей.\n Нажмите любую клавишу для продолжения...");
-                    _balance += client.CalculatePurchaseAmount();
+                    client.RemoveProductFromBasket(_random);
+
+                    Console.WriteLine($"У клиента не хватило денег для оплаты. Он убрал из корзины несколько товаров. Цена покупки составила {client.PurchaseAmount} рублей.\n Нажмите любую клавишу для продолжения...");
+                    
+                    _balance += client.PurchaseAmount;
                 }
 
                 Console.ReadKey();
                 Console.Clear();
             }
+        }
+
+        private void CreateQueue(int clientCount)
+        {
+            for (int i = 0; i < clientCount; i++)
+            {
+                CreateNewClient();
+            }
+        }
+
+        private void CreateNewClient()
+        {
+            _clients.Enqueue(new Client(_random));
         }
     }
 
@@ -75,10 +81,13 @@ namespace HomeWork1
         private int _money;
         private List<Product> _basket = new List<Product>();
 
+        public int PurchaseAmount { get; private set; }
+
         public Client(Random random)
         {
             _money = random.Next(150, 250);
             CreateBasket(random);
+            PurchaseAmount = CalculatePurchaseAmount();
         }
 
         public void CreateBasket(Random random)
@@ -91,17 +100,14 @@ namespace HomeWork1
             }
         }
 
-        public int RemoveProductFromBasket(Random random)
+        public void RemoveProductFromBasket(Random random)
         {
-            int productCount = 0;
-
-            while (_money<CalculatePurchaseAmount())
+            while (_money < PurchaseAmount)
             {
-                _basket.RemoveAt(random.Next(0, _basket.Count-1));
-                productCount++;
+                int productIndex = random.Next(0, _basket.Count - 1);
+                PurchaseAmount -= _basket[productIndex].Price;
+                _basket.RemoveAt(productIndex);
             }
-
-            return productCount;
         }
 
         public bool CheckSolvency()
@@ -124,55 +130,15 @@ namespace HomeWork1
 
     class Product
     {
-        private string _nameOfProduct;
+        public string _name;
 
         public int Price { get; private set; }
 
         public Product(Random random)
         {
             Price = random.Next(10, 50);
-            _nameOfProduct = GenerateName(random);
-        }
-
-        private string GenerateName(Random rand)
-        {
-            string name=string.Empty;
-
-            switch (rand.Next(1, 10))
-            {
-                case 1:
-                    name = "Огурец";
-                    break;
-                case 2:
-                    name = "Помидор";
-                    break;
-                case 3:
-                    name = "Виноград";
-                    break;
-                case 4:
-                    name = "Сыр";
-                    break;
-                case 5:
-                    name = "Свинина";
-                    break;
-                case 6:
-                    name = "Котлеты";
-                    break;
-                case 7:
-                    name = "Мороженое";
-                    break;
-                case 8:
-                    name = "Виски";
-                    break;
-                case 9:
-                    name = "Кока-кола";
-                    break;
-                case 10:
-                    name = "Тик-так";
-                    break;
-            }
-
-            return name;
+            string[] _names = { "Огурец", "Помидор", "Виноград", "Сыр", "Свинина", "Котлеты", "Мороженое", "Виски", "Кока-кола", "Тик-так" };
+            _name = _names[random.Next(0,_names.Length-1)];
         }
     }
 }
