@@ -1,0 +1,204 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.IO;
+
+namespace HomeWork1
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Battle battle = new Battle();
+            battle.Fight();
+        }
+    }
+
+    class Battle
+    {
+        private Random _random = new Random();
+        private Platoon _firstPlatoon;
+        private Platoon _secondPlatoon;
+
+        public Battle()
+        {
+            int soldiersCount = _random.Next(6, 10);
+
+            _firstPlatoon = new Platoon(soldiersCount, _random);
+            _secondPlatoon = new Platoon(soldiersCount, _random);
+        }
+
+        public void Fight()
+        {
+            while (_firstPlatoon.Health > 0 && _secondPlatoon.Health > 0)
+            {
+                _firstPlatoon.TakeDamage(_firstPlatoon);
+                _secondPlatoon.TakeDamage(_secondPlatoon);
+                ShowInfo();
+            }
+
+            if (_firstPlatoon.Health <= 0 && _secondPlatoon.Health <= 0)
+            {
+                Console.WriteLine("Ничья!");
+            }
+            else if (_firstPlatoon.Health <= 0)
+            {
+                Console.WriteLine("Победил второй взвод!");
+            }
+            else
+            {
+                Console.WriteLine("Победил первый взвод!");
+            }
+
+            Console.ReadKey();
+        }
+
+        public void ShowInfo()
+        {
+            Console.WriteLine($"У первого взвода {_firstPlatoon.SoldiersCount} солдат ({_firstPlatoon.Health} health)");
+            Console.WriteLine($"У второго взвода {_secondPlatoon.SoldiersCount} солдат ({_secondPlatoon.Health} health)");
+            Console.WriteLine();
+        }
+    }
+
+    class Platoon
+    {
+        private List<Soldier> _soldiers;
+        private Random _random;
+        private int _damageDefault;
+        private int _healthDefault;
+
+        public int SoldiersCount { get; private set; }
+        public int Health { get; private set; }
+
+        public Platoon(int count, Random random)
+        {
+            _random = random;
+            SoldiersCount = count;
+            _soldiers = new List<Soldier>(SoldiersCount);
+            _damageDefault = 50;
+            _healthDefault = 200;
+            CreateSoldiers();
+
+            for (int i = 0; i < _soldiers.Count; i++)
+            {
+                Health += _soldiers[i].Health;
+            }
+        }
+
+        public void ShowInfo()
+        {
+            for (int i = 0; i < _soldiers.Count; i++)
+            {
+                Console.WriteLine($"{_soldiers[i].Weapon} - {_soldiers[i].Health}");
+            }
+        }
+
+        public void TakeDamage(Platoon platoon)
+        {
+            Soldier soldierToDamage = platoon.SelectRandomSoldier();
+
+            int count;
+
+            switch (soldierToDamage.Weapon)
+            {
+                case "pistol":
+                    TakeDamage(soldierToDamage);
+                    break;
+                case "machinegun":
+                    if (_soldiers.Count / 2 == 0)
+                        count = 1;
+                    else
+                        count = _soldiers.Count / 2;
+
+                    for (int i = 0; i < count; i++)
+                        TakeDamage(soldierToDamage);
+                    break;
+                case "rocket":
+                    for (int i = 0; i < _soldiers.Count; i++)
+                        TakeDamage(soldierToDamage);
+                    break;
+            }
+        }
+
+        public Soldier SelectRandomSoldier()
+        {
+            return _soldiers[_random.Next(0, SoldiersCount-1)];
+        }
+
+        private void TakeDamage(Soldier soldier)
+        {
+            Soldier soldierTakeDamage = SelectRandomSoldier();
+            soldierTakeDamage.TakeDamage(soldier);
+            Health -= soldier.Damage;
+
+            if (soldierTakeDamage.Health <= 0)
+            {
+                Health -= soldierTakeDamage.Health;
+                KillSoldier(soldierTakeDamage);
+            }
+                
+        }
+
+        private void KillSoldier(Soldier soldier)
+        {
+            _soldiers.Remove(soldier);
+            SoldiersCount--;
+        }
+
+        private void CreateSoldiers()
+        {
+            for (int i = 0; i < SoldiersCount; i++)
+            {
+                switch (_random.Next(1, 3))
+                {
+                    case 1:
+                        _soldiers.Add(new ShooterPistol(_damageDefault, _healthDefault));
+                        break;
+                    case 2:
+                        _soldiers.Add(new ShooterMachineGun(_damageDefault, _healthDefault));
+                        break;
+                    case 3:
+                        _soldiers.Add(new ShooterRocketLauncher(_damageDefault, _healthDefault));
+                        break;
+                }
+            }
+        }
+    }
+
+    abstract class Soldier
+    {
+        public int Damage { get; private set; }
+        public int Health { get; private set; }
+        public string Weapon { get; private set; }
+
+        public Soldier(int damage, int health, string weapon)
+        {
+            Damage = damage;
+            Health = health;
+            Weapon = weapon;
+        }
+
+        public void TakeDamage(Soldier soldier)
+        {
+            Health -= soldier.Damage;
+        }
+    }
+
+    class ShooterPistol : Soldier
+    {
+        public ShooterPistol(int damage, int health) : base(damage, health, "pistol") { }
+    }
+
+    class ShooterMachineGun : Soldier
+    {
+        public ShooterMachineGun(int damage, int health) : base(damage/3, health, "machinegun") { }
+    }
+
+    class ShooterRocketLauncher : Soldier
+    {
+        public ShooterRocketLauncher(int damage, int health) : base(damage/5, health, "rocket") { }
+    }
+}
