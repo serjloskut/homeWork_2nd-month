@@ -58,8 +58,7 @@ namespace HomeWork1
         public void ShowInfo()
         {
             Console.WriteLine($"У первого взвода {_firstPlatoon.SoldiersCount} солдат ({_firstPlatoon.Health} health)");
-            Console.WriteLine($"У второго взвода {_secondPlatoon.SoldiersCount} солдат ({_secondPlatoon.Health} health)");
-            Console.WriteLine();
+            Console.WriteLine($"У второго взвода {_secondPlatoon.SoldiersCount} солдат ({_secondPlatoon.Health} health)\n");
         }
     }
 
@@ -123,9 +122,9 @@ namespace HomeWork1
             }
         }
 
-        public Soldier SelectRandomSoldier()
+        private Soldier SelectRandomSoldier()
         {
-            return _soldiers[_random.Next(0, SoldiersCount-1)];
+            return _soldiers[_random.Next(0, SoldiersCount - 1)];
         }
 
         private void TakeDamage(Soldier soldier)
@@ -139,7 +138,6 @@ namespace HomeWork1
                 Health -= soldierTakeDamage.Health;
                 KillSoldier(soldierTakeDamage);
             }
-                
         }
 
         private void KillSoldier(Soldier soldier)
@@ -189,16 +187,18 @@ namespace HomeWork1
 
     class ShooterPistol : Soldier
     {
-        public ShooterPistol(int damage, int health) : base(damage, health, "pistol") { }
+        public ShooterPistol(int damage, int health) : base(damage, health, "pistol")
+        {
+        }
     }
 
     class ShooterMachineGun : Soldier
     {
-        public ShooterMachineGun(int damage, int health) : base(damage/3, health, "machinegun") { }
+        public ShooterMachineGun(int damage, int health) : base(damage / 3, health, "machinegun") { }
     }
 
     class ShooterRocketLauncher : Soldier
     {
-        public ShooterRocketLauncher(int damage, int health) : base(damage/5, health, "rocket") { }
+        public ShooterRocketLauncher(int damage, int health) : base(damage / 5, health, "rocket") { }
     }
 }
