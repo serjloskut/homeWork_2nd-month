@@ -11,47 +11,195 @@ namespace HomeWork1
     {
         static void Main(string[] args)
         {
-
+            Random random = new Random();
+            Zoo zoo = new Zoo(random);
+            zoo.ToWork();
         }
     }
 
     class Zoo
     {
         private List<Aviary> _aviaries;
+        private Random _random;
+
+        public Zoo(Random random)
+        {
+            _aviaries = new List<Aviary>();
+            _random = random;
+            int aviaryCount = random.Next(4, 15);
+
+            for (int i = 0; i < aviaryCount; i++)
+            {
+                AddAviary();
+            }
+        }
+
+        private void AddAviary()
+        {
+            _aviaries.Add(new Aviary(_random));
+        }
+
+        public void ToWork()
+        {
+            while (true)
+            {
+                int number = _aviaries.Count + 1;
+
+                while (number > _aviaries.Count - 1)
+                {
+                    Console.WriteLine("Выберите, к какому вольеру вы хотите подойти.");
+
+                    for (int i = 0; i < _aviaries.Count; i++)
+                    {
+                        Console.WriteLine("Вольер №" + i);
+                    }
+
+                    number = TryParseNumber();
+
+                    if (number > _aviaries.Count - 1)
+                    {
+                        Console.WriteLine("Вольер с таким номером не существует..\n");
+                    }
+                }
+
+                Console.Clear();
+                Console.WriteLine($"Вы подошли к вольеру №{number}");
+                _aviaries[number].ShowInfo();
+                Console.WriteLine("\nНажмите любую клавишу чтобы вернуться к выбору вольеров...");
+                Console.ReadKey();
+                Console.Clear();
+            }
+        }
+
+        private int TryParseNumber()
+        {
+            int resultParse;
+
+            while (int.TryParse(Console.ReadLine(), out resultParse) == false)
+            {
+                Console.Write("Необходимо ввести число! Повпробуйте ввести еще раз: ");
+            }
+
+            return resultParse;
+        }
+
+
     }
 
     class Aviary
     {
         private List<Animal> _animals;
+        private Random _random;
+
+        public Aviary(Random random)
+        {
+            _animals = new List<Animal>();
+            _random = random;
+            AddAnimals();
+        }
+
+        public void ShowInfo()
+        {
+            Console.WriteLine($"Информация о вольере:\n" +
+                $"Животные: {_animals[0].Name}\n" +
+                $"Количество: {_animals.Count}\n" +
+                $"Пол: {_animals[0].Sex}\n" +
+                $"Издает звук: {_animals[0].Sound}\n");
+        }
+
+        private void AddAnimals()
+        {
+            int countAnimal = _random.Next(5, 10);
+
+            switch (_random.Next(1, 5))
+            {
+                case 1:
+                    for (int i = 0; i < countAnimal; i++)
+                    {
+                        _animals.Add(new Cat("мужской"));
+                    }
+                    break;
+                case 2:
+                    for (int i = 0; i < countAnimal; i++)
+                    {
+                        _animals.Add(new Dog("женский"));
+                    }
+                    break;
+                case 3:
+                    for (int i = 0; i < countAnimal; i++)
+                    {
+                        _animals.Add(new Cow("женский"));
+                    }
+                    break;
+                case 4:
+                    for (int i = 0; i < countAnimal; i++)
+                    {
+                        _animals.Add(new Horse("женский"));
+                    }
+                    break;
+                case 5:
+                    for (int i = 0; i < countAnimal; i++)
+                    {
+                        _animals.Add(new Rooster("мужской"));
+                    }
+                    break;
+            }
+        }
     }
 
-    class Animal
+    abstract class Animal
     {
+        protected Random Random = new Random();
 
+        public string Name { get; private set; }
+        public string Sex { get; private set; }
+        public string Sound { get; private set; }
+
+        public Animal(string name, string sex, string sound)
+        {
+            Name = name;
+            Sound = sound;
+            Sex = sex;
+        }
     }
 
     class Cat : Animal
     {
+        public Cat(string sex) : base("Кошка", sex, "Мяу")
+        {
 
+        }
     }
 
     class Dog : Animal
     {
+        public Dog(string sex) : base("Собака", sex, "Гав")
+        {
 
+        }
     }
 
     class Cow : Animal
     {
+        public Cow(string sex) : base("Корова", sex, "Му")
+        {
 
+        }
     }
 
     class Horse : Animal
     {
+        public Horse(string sex) : base("Лошадь", sex, "Иго-го")
+        {
 
+        }
     }
 
     class Rooster : Animal
     {
+        public Rooster(string sex) : base("Петух", sex, "Кукареку")
+        {
 
+        }
     }
 }
