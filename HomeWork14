@@ -34,11 +34,6 @@ namespace HomeWork1
             }
         }
 
-        private void AddAviary()
-        {
-            _aviaries.Add(new Aviary(_random));
-        }
-
         public void ToWork()
         {
             while (true)
@@ -81,6 +76,11 @@ namespace HomeWork1
             }
 
             return resultParse;
+        }
+        
+        private void AddAviary()
+        {
+            _aviaries.Add(new Aviary(_random));
         }
     }
 
