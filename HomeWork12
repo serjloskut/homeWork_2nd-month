@@ -34,8 +34,10 @@ namespace HomeWork1
         {
             while (_firstPlatoon.Health > 0 && _secondPlatoon.Health > 0)
             {
-                _firstPlatoon.TakeDamage(_firstPlatoon);
-                _secondPlatoon.TakeDamage(_secondPlatoon);
+                _firstPlatoon.TakeDamage(_secondPlatoon);
+
+                if (_firstPlatoon.SoldiersCount > 0)
+                    _secondPlatoon.TakeDamage(_firstPlatoon);
                 ShowInfo();
             }
 
@@ -69,17 +71,22 @@ namespace HomeWork1
         private int _damageDefault;
         private int _healthDefault;
 
-        public int SoldiersCount { get; private set; }
+        public int SoldiersCount
+        {
+            get
+            {
+                return _soldiers.Count;
+            }
+        }
         public int Health { get; private set; }
 
         public Platoon(int count, Random random)
         {
             _random = random;
-            SoldiersCount = count;
-            _soldiers = new List<Soldier>(SoldiersCount);
+            _soldiers = new List<Soldier>();
             _damageDefault = 50;
             _healthDefault = 200;
-            CreateSoldiers();
+            CreateSoldiers(count);
 
             for (int i = 0; i < _soldiers.Count; i++)
             {
@@ -113,42 +120,47 @@ namespace HomeWork1
                         count = _soldiers.Count / 2;
 
                     for (int i = 0; i < count; i++)
-                        TakeDamage(soldierToDamage);
+                        if (platoon.SoldiersCount > 0)
+                            TakeDamage(soldierToDamage);
+
                     break;
                 case "rocket":
                     for (int i = 0; i < _soldiers.Count; i++)
-                        TakeDamage(soldierToDamage);
+                        if (platoon.SoldiersCount > 0)
+                            TakeDamage(soldierToDamage);
                     break;
             }
         }
 
         private Soldier SelectRandomSoldier()
         {
-            return _soldiers[_random.Next(0, SoldiersCount - 1)];
+                int index = _random.Next(0, SoldiersCount - 1);
+                return _soldiers[index];
         }
 
         private void TakeDamage(Soldier soldier)
         {
             Soldier soldierTakeDamage = SelectRandomSoldier();
-            soldierTakeDamage.TakeDamage(soldier);
-            Health -= soldier.Damage;
+
+            if (soldierTakeDamage.Health < soldier.Damage)
+                Health -= soldierTakeDamage.Health;
+            else
+                Health -= soldier.Damage;
+
+            soldierTakeDamage.TakeDamage(soldier.Damage);
 
             if (soldierTakeDamage.Health <= 0)
-            {
-                Health -= soldierTakeDamage.Health;
-                KillSoldier(soldierTakeDamage);
-            }
+                RemoveDeathSoldier(soldierTakeDamage);
         }
 
-        private void KillSoldier(Soldier soldier)
+        private void RemoveDeathSoldier(Soldier soldier)
         {
             _soldiers.Remove(soldier);
-            SoldiersCount--;
         }
 
-        private void CreateSoldiers()
+        private void CreateSoldiers(int count)
         {
-            for (int i = 0; i < SoldiersCount; i++)
+            for (int i = 0; i < count; i++)
             {
                 switch (_random.Next(1, 3))
                 {
@@ -179,9 +191,9 @@ namespace HomeWork1
             Weapon = weapon;
         }
 
-        public void TakeDamage(Soldier soldier)
+        public void TakeDamage(int damage)
         {
-            Health -= soldier.Damage;
+            Health -= damage;
         }
     }
 
