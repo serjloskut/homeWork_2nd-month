@@ -19,9 +19,7 @@ namespace HomeWork1
     class Aquarium
     {
         private List<Fish> _fishes;
-        private int _fishCount;
         private int _fishMax;
-        private int _ageOfDeath;
         private Random _random = new Random();
 
         public bool IsFull { get; private set; }
@@ -29,8 +27,7 @@ namespace HomeWork1
         public Aquarium()
         {
             _fishes = new List<Fish>();
-            _fishMax = _random.Next(3,10);
-            _ageOfDeath = 7;
+            _fishMax = _random.Next(3, 10);
             IsFull = false;
         }
 
@@ -43,12 +40,12 @@ namespace HomeWork1
                 Console.SetCursorPosition(0, 10);
                 ShowInfo();
 
-                if (_fishCount == 0)
+                if (_fishes.Count == 0)
                     Console.WriteLine("Аквариум пустой.");
                 else
-                    Console.WriteLine($"Заполненость аквариума {_fishCount} из {_fishMax}. Максимальный возраст рыбы {_ageOfDeath} лет");
+                    Console.WriteLine($"Заполненость аквариума {_fishes.Count} из {_fishMax}.");
 
-                Console.SetCursorPosition(0,0);
+                Console.SetCursorPosition(0, 0);
                 Console.WriteLine("1. Добавить рыбу.\n" +
                     "2. Достать рыбу.\n" +
                     "3. Прожить 1 год.\n" +
@@ -59,15 +56,17 @@ namespace HomeWork1
                 {
                     case "1":
                         AddFish();
+                        SkipYear();
                         break;
                     case "2":
                         GetOutFish();
+                        SkipYear();
                         break;
                     case "3":
                         SkipYear();
                         break;
                     case "4":
-                        isContinue=false;
+                        isContinue = false;
                         break;
                     default:
                         SkipYear();
@@ -76,7 +75,7 @@ namespace HomeWork1
                         break;
                 }
 
-                if (_fishCount <= 0)
+                if (_fishes.Count <= 0)
                     isContinue = false;
 
                 Console.Clear();
@@ -85,14 +84,13 @@ namespace HomeWork1
 
         private void AddFish()
         {
-            if (!IsFull)
+            if (IsFull==false)
             {
                 Console.Write("Введите название рыбы, которую хотите добавить: ");
                 string name = Console.ReadLine();
                 _fishes.Add(new Fish(name));
-                _fishCount++;
 
-                if (_fishCount == _fishMax)
+                if (_fishes.Count == _fishMax)
                     IsFull = true;
             }
             else
@@ -102,7 +100,6 @@ namespace HomeWork1
             }
 
             Console.Clear();
-            SkipYear();
         }
 
         private void GetOutFish()
@@ -112,7 +109,7 @@ namespace HomeWork1
 
             Fish fish = FindFish(name);
 
-            if(fish == null)
+            if (fish == null)
             {
                 Console.WriteLine("Такой рыбы нет в аквариуме. Нажмите любую клавишу для продолжения....");
                 Console.ReadKey();
@@ -120,10 +117,7 @@ namespace HomeWork1
             else
             {
                 _fishes.Remove(fish);
-                _fishCount--;
             }
-
-            SkipYear();
         }
 
         private void ShowInfo()
@@ -143,11 +137,8 @@ namespace HomeWork1
             for (int i = 0; i < _fishes.Count; i++)
             {
                 if (name == _fishes[i].Name)
-                {
                     fish = _fishes[i];
-                    _fishCount--;
-                }
-                    
+
             }
 
             return fish;
@@ -159,38 +150,41 @@ namespace HomeWork1
             {
                 _fishes[i].SkipYear();
             }
-
-            for (int i = 0; i < _fishes.Count; i++)
-            {
-                if (_fishes[i].Age == _ageOfDeath)
-                {
-                    _fishes.Remove(_fishes[i]);
-                    _fishCount--;
-                }
-            }
         }
     }
 
     class Fish
     {
+        private int _ageOfDeath;
+        private Random _random = new Random();
+
         public int Age { get; private set; }
 
         public string Name { get; private set; }
+        public bool IsAlive { get; private set; }
 
         public Fish(string name)
         {
             Name = name;
             Age = 0;
+            _ageOfDeath = _random.Next(4,8);
+            IsAlive = true;
         }
 
         public void ShowInfo()
         {
-            Console.WriteLine($"{Name}. Возраст: {Age}");
+            if(IsAlive)
+                Console.WriteLine($"{Name}. Возраст: {Age}. Приказано прожить: {_ageOfDeath} лет");
+            else
+                Console.WriteLine($"{Name}. Уже умерла. Пора бы ее достать.");
         }
 
         public void SkipYear()
         {
             Age++;
+
+            if (Age > _ageOfDeath)
+                IsAlive = false;
         }
     }
 }
