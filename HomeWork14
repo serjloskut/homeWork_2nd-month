@@ -1,0 +1,57 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.IO;
+
+namespace HomeWork1
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+
+        }
+    }
+
+    class Zoo
+    {
+        private List<Aviary> _aviaries;
+    }
+
+    class Aviary
+    {
+        private List<Animal> _animals;
+    }
+
+    class Animal
+    {
+
+    }
+
+    class Cat : Animal
+    {
+
+    }
+
+    class Dog : Animal
+    {
+
+    }
+
+    class Cow : Animal
+    {
+
+    }
+
+    class Horse : Animal
+    {
+
+    }
+
+    class Rooster : Animal
+    {
+
+    }
+}
