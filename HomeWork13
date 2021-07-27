@@ -12,7 +12,7 @@ namespace HomeWork1
         static void Main(string[] args)
         {
             Aquarium aquarium = new Aquarium();
-            aquarium.Life();
+            aquarium.ToWork();
         }
     }
 
@@ -31,7 +31,7 @@ namespace HomeWork1
             IsFull = false;
         }
 
-        public void Life()
+        public void ToWork()
         {
             bool isContinue = true;
 
@@ -84,7 +84,7 @@ namespace HomeWork1
 
         private void AddFish()
         {
-            if (IsFull==false)
+            if (IsFull == false)
             {
                 Console.Write("Введите название рыбы, которую хотите добавить: ");
                 string name = Console.ReadLine();
@@ -104,10 +104,10 @@ namespace HomeWork1
 
         private void GetOutFish()
         {
-            Console.Write("Введите название рыбы, которую хотите достать: ");
-            string name = Console.ReadLine();
+            Console.Write("Введите номер рыбы, которую хотите достать: ");
+            int number = TryParseNumber();
 
-            Fish fish = FindFish(name);
+            Fish fish = FindFish(number);
 
             if (fish == null)
             {
@@ -120,28 +120,35 @@ namespace HomeWork1
             }
         }
 
+        private int TryParseNumber()
+        {
+            int resultParse;
+
+            while (!int.TryParse(Console.ReadLine(), out resultParse))
+            {
+                Console.Write("Необходимо ввести число! Повпробуйте ввести еще раз: ");
+            }
+
+            return resultParse;
+        }
+
         private void ShowInfo()
         {
             Console.WriteLine("Информация об аквариуме:");
 
             for (int i = 0; i < _fishes.Count; i++)
             {
+                Console.Write(i + ". ");
                 _fishes[i].ShowInfo();
             }
         }
 
-        private Fish FindFish(string name)
+        private Fish FindFish(int number)
         {
-            Fish fish = null;
-
-            for (int i = 0; i < _fishes.Count; i++)
-            {
-                if (name == _fishes[i].Name)
-                    fish = _fishes[i];
-
-            }
-
-            return fish;
+            if (number > _fishes.Count - 1)
+                return null;
+            else
+                return _fishes[number];
         }
 
         private void SkipYear()
@@ -167,13 +174,13 @@ namespace HomeWork1
         {
             Name = name;
             Age = 0;
-            _ageOfDeath = _random.Next(4,8);
+            _ageOfDeath = _random.Next(4, 8);
             IsAlive = true;
         }
 
         public void ShowInfo()
         {
-            if(IsAlive)
+            if (IsAlive)
                 Console.WriteLine($"{Name}. Возраст: {Age}. Приказано прожить: {_ageOfDeath} лет");
             else
                 Console.WriteLine($"{Name}. Уже умерла. Пора бы ее достать.");
