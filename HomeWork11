@@ -42,7 +42,7 @@ namespace HomeWork1
                 Console.WriteLine($"\nКлиент хочет купить продуктов на сумму {client.PurchaseAmount} рублей. Ждем, пока покупатель посчитает деньги...");
                 System.Threading.Thread.Sleep(timeWait);
 
-                if (client.CheckSolvency())
+                if (client.IsSolvency)
                 {
                     Console.WriteLine("Клиент сделал покупку.");
                     _balance += client.PurchaseAmount;
@@ -52,7 +52,7 @@ namespace HomeWork1
                     client.RemoveProduct();
 
                     Console.WriteLine($"У клиента не хватило денег для оплаты. Он убрал из корзины несколько товаров. Цена покупки составила {client.PurchaseAmount} рублей.\n Нажмите любую клавишу для продолжения...");
-                    
+
                     _balance += client.PurchaseAmount;
                 }
 
@@ -82,11 +82,12 @@ namespace HomeWork1
         private Random _random = new Random();
 
         public int PurchaseAmount { get; private set; }
+        public bool IsSolvency { get; private set; }
 
         public Client(Random random)
         {
             _random = random;
-            _money = _random.Next(150, 250);
+            _money = _random.Next(150, 160);
             CreateBasket();
             PurchaseAmount = CalculatePurchaseAmount();
         }
@@ -99,11 +100,6 @@ namespace HomeWork1
                 PurchaseAmount -= _basket[productIndex].Price;
                 _basket.RemoveAt(productIndex);
             }
-        }
-
-        public bool CheckSolvency()
-        {
-            return _money >= PurchaseAmount;
         }
 
         private void CreateBasket()
@@ -125,6 +121,8 @@ namespace HomeWork1
                 purchaseAmount += _basket[i].Price;
             }
 
+            IsSolvency = (_money >= purchaseAmount);
+
             return purchaseAmount;
         }
     }
@@ -139,7 +137,7 @@ namespace HomeWork1
         {
             Price = random.Next(10, 50);
             string[] _names = { "Огурец", "Помидор", "Виноград", "Сыр", "Свинина", "Котлеты", "Мороженое", "Виски", "Кока-кола", "Тик-так" };
-            _name = _names[random.Next(0,_names.Length-1)];
+            _name = _names[random.Next(0, _names.Length - 1)];
         }
     }
 }
