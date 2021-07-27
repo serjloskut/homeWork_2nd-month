@@ -26,7 +26,7 @@ namespace HomeWork1
         {
             _aviaries = new List<Aviary>();
             _random = random;
-            int aviaryCount = random.Next(4, 15);
+            int aviaryCount = random.Next(4, 30);
 
             for (int i = 0; i < aviaryCount; i++)
             {
@@ -63,9 +63,9 @@ namespace HomeWork1
                 }
 
                 Console.Clear();
-                Console.WriteLine($"Вы подошли к вольеру №{number}");
+                Console.WriteLine($"Вы подошли к вольеру №{number}\n");
                 _aviaries[number].ShowInfo();
-                Console.WriteLine("\nНажмите любую клавишу чтобы вернуться к выбору вольеров...");
+                Console.WriteLine("Нажмите любую клавишу чтобы вернуться к выбору вольеров...");
                 Console.ReadKey();
                 Console.Clear();
             }
@@ -82,14 +82,21 @@ namespace HomeWork1
 
             return resultParse;
         }
-
-
     }
 
     class Aviary
     {
         private List<Animal> _animals;
         private Random _random;
+        private string[,] _animalsSound =
+        {
+            {"Кошка","Мяу"},
+            {"Собака", "Гав"},
+            {"Корова", "Му"},
+            {"Лошадь", "Иго-го"},
+            {"Петух", "Кукареку"},
+            {"Свинья", "Хрю"}
+        };
 
         public Aviary(Random random)
         {
@@ -109,48 +116,23 @@ namespace HomeWork1
 
         private void AddAnimals()
         {
-            int countAnimal = _random.Next(5, 10);
+            int random = _random.Next(0,_animalsSound.GetLength(0)-1);
+            int countAnimal = _random.Next(70, 100);
+            int randomSex = _random.Next(1, 2);
+            string sex;
 
-            switch (_random.Next(1, 5))
-            {
-                case 1:
-                    for (int i = 0; i < countAnimal; i++)
-                    {
-                        _animals.Add(new Cat("мужской"));
-                    }
-                    break;
-                case 2:
-                    for (int i = 0; i < countAnimal; i++)
-                    {
-                        _animals.Add(new Dog("женский"));
-                    }
-                    break;
-                case 3:
-                    for (int i = 0; i < countAnimal; i++)
-                    {
-                        _animals.Add(new Cow("женский"));
-                    }
-                    break;
-                case 4:
-                    for (int i = 0; i < countAnimal; i++)
-                    {
-                        _animals.Add(new Horse("женский"));
-                    }
-                    break;
-                case 5:
-                    for (int i = 0; i < countAnimal; i++)
-                    {
-                        _animals.Add(new Rooster("мужской"));
-                    }
-                    break;
-            }
+            if (randomSex == 1)
+                sex = "Мужской";
+            else
+                sex = "Женский";
+
+            for (int i = 0; i < countAnimal; i++)
+                _animals.Add(new Animal(_animalsSound[random, 0],sex, _animalsSound[random, 1]));
         }
     }
 
-    abstract class Animal
+    class Animal
     {
-        protected Random Random = new Random();
-
         public string Name { get; private set; }
         public string Sex { get; private set; }
         public string Sound { get; private set; }
@@ -160,46 +142,6 @@ namespace HomeWork1
             Name = name;
             Sound = sound;
             Sex = sex;
-        }
-    }
-
-    class Cat : Animal
-    {
-        public Cat(string sex) : base("Кошка", sex, "Мяу")
-        {
-
-        }
-    }
-
-    class Dog : Animal
-    {
-        public Dog(string sex) : base("Собака", sex, "Гав")
-        {
-
-        }
-    }
-
-    class Cow : Animal
-    {
-        public Cow(string sex) : base("Корова", sex, "Му")
-        {
-
-        }
-    }
-
-    class Horse : Animal
-    {
-        public Horse(string sex) : base("Лошадь", sex, "Иго-го")
-        {
-
-        }
-    }
-
-    class Rooster : Animal
-    {
-        public Rooster(string sex) : base("Петух", sex, "Кукареку")
-        {
-
         }
     }
 }
