@@ -11,45 +11,45 @@ namespace HomeWork1
     {
         static void Main(string[] args)
         {
-            Random random = new Random();
-            Zoo zoo = new Zoo(random);
-            zoo.ToWork();
+            Zoo zoo = new Zoo();
+            zoo.Work();
         }
     }
 
     class Zoo
     {
         private List<Aviary> _aviaries;
-        private Random _random;
 
-        public Zoo(Random random)
+        public Zoo()
         {
             _aviaries = new List<Aviary>();
-            _random = random;
+            Random random = new Random(); ;
             int aviaryCount = random.Next(4, 30);
 
             for (int i = 0; i < aviaryCount; i++)
             {
-                AddAviary();
+                AddAviary(random);
             }
         }
 
-        public void ToWork()
+        public void Work()
         {
-            while (true)
+            int countWhile = 10;
+
+            for (int i = 0; i < countWhile; i++)
             {
                 int number = _aviaries.Count + 1;
 
                 while (number > _aviaries.Count - 1)
                 {
-                    Console.WriteLine("Выберите, к какому вольеру вы хотите подойти.");
+                    Console.WriteLine($"Вы можете посмотреь {countWhile - i} вольеров. Выберите, к какому вольеру вы хотите подойти.");
 
-                    for (int i = 0; i < _aviaries.Count; i++)
+                    for (int j = 0; j < _aviaries.Count; j++)
                     {
-                        Console.WriteLine("Вольер №" + i);
+                        Console.WriteLine("Вольер №" + j);
                     }
 
-                    number = TryParseNumber();
+                    number = GetNumber();
 
                     if (number > _aviaries.Count - 1)
                     {
@@ -66,43 +66,50 @@ namespace HomeWork1
             }
         }
 
-        private int TryParseNumber()
+        private int GetNumber()
         {
-            int resultParse;
+            int resultParse = -1;
+            bool isContinue = true;
 
-            while (int.TryParse(Console.ReadLine(), out resultParse) == false)
+            while (isContinue)
             {
-                Console.Write("Необходимо ввести число! Повпробуйте ввести еще раз: ");
+                if (int.TryParse(Console.ReadLine(), out resultParse) == false)
+                {
+                    Console.Write("Необходимо ввести число! Повпробуйте ввести еще раз: ");
+                }
+                else
+                {
+                    if (resultParse < 0)
+                        Console.Write("Необходимо ввести число больше нуля! Повпробуйте ввести еще раз: ");
+                    else
+                        isContinue = false;
+                }
             }
 
             return resultParse;
         }
-        
-        private void AddAviary()
+
+        private void AddAviary(Random random)
         {
-            _aviaries.Add(new Aviary(_random));
+            _aviaries.Add(new Aviary(random));
         }
     }
 
     class Aviary
     {
         private List<Animal> _animals;
-        private Random _random;
-        private string[,] _animalsSound =
-        {
-            {"Кошка","Мяу"},
-            {"Собака", "Гав"},
-            {"Корова", "Му"},
-            {"Лошадь", "Иго-го"},
-            {"Петух", "Кукареку"},
-            {"Свинья", "Хрю"}
-        };
+        private string[,] _arrayAnimalsAndSounds;
+        private int _maleCount;
+        private int _femaleCount;
 
-        public Aviary(Random random)
+        public Aviary(Random rand)
         {
             _animals = new List<Animal>();
-            _random = random;
-            AddAnimals();
+            _arrayAnimalsAndSounds = new string[,] { { "Кошка", "Мяу" }, { "Собака", "Гав" }, { "Корова", "Му" }, { "Лошадь", "Иго-го" }, { "Петух", "Кукареку" }, { "Свинья", "Хрю" } };
+            _maleCount = 0;
+            _femaleCount = 0;
+            Random random = rand;
+            AddAnimals(random);
         }
 
         public void ShowInfo()
@@ -110,24 +117,30 @@ namespace HomeWork1
             Console.WriteLine($"Информация о вольере:\n" +
                 $"Животные: {_animals[0].Name}\n" +
                 $"Количество: {_animals.Count}\n" +
-                $"Пол: {_animals[0].Sex}\n" +
+                $"Пол: ж: {_femaleCount}, м: {_maleCount}\n" +
                 $"Издает звук: {_animals[0].Sound}\n");
         }
 
-        private void AddAnimals()
+        private void AddAnimals(Random rand)
         {
-            int random = _random.Next(0,_animalsSound.GetLength(0)-1);
-            int countAnimal = _random.Next(70, 100);
-            int randomSex = _random.Next(1, 2);
-            string sex;
-
-            if (randomSex == 1)
-                sex = "Мужской";
-            else
-                sex = "Женский";
+            int numberAnimal = rand.Next(0, _arrayAnimalsAndSounds.GetLength(0));
+            int countAnimal = rand.Next(70, 100);
 
             for (int i = 0; i < countAnimal; i++)
-                _animals.Add(new Animal(_animalsSound[random, 0],sex, _animalsSound[random, 1]));
+            {
+                int randomSex = rand.Next(1, 3);
+
+                if (randomSex == 1)
+                {
+                    _animals.Add(new Animal(_arrayAnimalsAndSounds[numberAnimal, 0], "Мужской", _arrayAnimalsAndSounds[numberAnimal, 1]));
+                    _maleCount++;
+                }
+                else
+                {
+                    _animals.Add(new Animal(_arrayAnimalsAndSounds[numberAnimal, 0], "Женский", _arrayAnimalsAndSounds[numberAnimal, 1]));
+                    _femaleCount++;
+                }
+            }
         }
     }
 
