@@ -38,7 +38,7 @@ namespace HomeWork1
 
             for (int i = 0; i < countWhile; i++)
             {
-                int number = _aviaries.Count + 1;
+                int number = int.MaxValue;
 
                 while (number > _aviaries.Count - 1)
                 {
@@ -128,9 +128,9 @@ namespace HomeWork1
 
             for (int i = 0; i < countAnimal; i++)
             {
-                int randomSex = rand.Next(1, 3);
+                int randomSex = rand.Next((int)Sex.male,(int)Sex.female+1);
 
-                if (randomSex == 1)
+                if (randomSex == (int)Sex.male)
                 {
                     _animals.Add(new Animal(_arrayAnimalsAndSounds[numberAnimal, 0], "Мужской", _arrayAnimalsAndSounds[numberAnimal, 1]));
                     _maleCount++;
@@ -156,5 +156,11 @@ namespace HomeWork1
             Sound = sound;
             Sex = sex;
         }
+    }
+
+    enum Sex
+    {
+        male,
+        female
     }
 }
