@@ -1,0 +1,143 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.IO;
+
+namespace HomeWork1
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            int countClients = 10;
+            CarService carService = new CarService(countClients);
+        }
+    }
+
+    class CarService
+    {
+        private Dictionary<Detail, int> _warehousDetails;
+        private Queue<Client> _clients;
+        private Random _random;
+        private int _money;
+        private int _priceForWorkInPercent;
+        private int _pricePenaltyInPercent;
+
+        public int RepairCost { get; private set; }
+
+        public CarService(int count)
+        {
+            _warehousDetails = new Dictionary<Detail, int>();
+            _clients = new Queue<Client>();
+            _random = new Random();
+            _money = 0;
+            _priceForWorkInPercent = 10;
+            _pricePenaltyInPercent = 5;
+
+            int random = _random.Next(5,10);
+
+            for (int i = 0; i < random; i++)
+            {
+                AddDetailToWarehouse();
+            }
+        }
+
+        private void AddNewClient()
+        {
+
+        }
+
+        private void AddDetailToWarehouse()
+        {
+            Console.Write("Введите название детали: ");
+            string name = Console.ReadLine();
+
+            Console.Write("Введите количество деталей: ");
+            int count = TryParseNumber();
+
+            Detail detail = IsInStock(name);
+
+            if (detail == null)
+            {
+                Console.Write("Такой детали на складе еще не было. Введите стоимость детали: ");
+                int price = TryParseNumber();
+                _warehousDetails.Add(new Detail(name, price),count);
+            }
+            else
+            {
+                _warehousDetails[detail] += count;
+            }
+        }
+
+        private int TryParseNumber()
+        {
+            int resultParse;
+
+            while (int.TryParse(Console.ReadLine(), out resultParse) == false)
+            {
+                Console.Write("Необходимо ввести число! Повпробуйте ввести еще раз: ");
+            }
+
+            return resultParse;
+        }
+
+        private void FixDetail()
+        {
+
+        }
+
+        private void RemoveDetail()
+        {
+
+        }
+
+        private void TakePayment()
+        {
+
+        }
+
+        private void PayFine()
+        {
+
+        }
+
+        private Detail IsInStock(string name)
+        {
+            Detail detailInStock = null;
+
+            foreach (var detail in _warehousDetails)
+            {
+                if (detail.Key.Name == name)
+                    detailInStock=detail.Key;
+            }
+
+            return detailInStock;
+        }
+    }
+
+    class Client
+    {
+        private int _money;
+
+        public Detail BrokenDetail { get; private set; }
+
+        public Client(Detail detail)
+        {
+            BrokenDetail = detail;
+        }
+    }
+
+    class Detail
+    {
+        public string Name { get; private set; }
+        public int Price { get; private set; }
+
+        public Detail(string name, int price)
+        {
+            Name = name;
+            Price = price;
+        }
+    }
+}
