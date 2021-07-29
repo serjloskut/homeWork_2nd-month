@@ -108,8 +108,7 @@ namespace HomeWork1
             _arrayAnimalsAndSounds = new string[,] { { "Кошка", "Мяу" }, { "Собака", "Гав" }, { "Корова", "Му" }, { "Лошадь", "Иго-го" }, { "Петух", "Кукареку" }, { "Свинья", "Хрю" } };
             _maleCount = 0;
             _femaleCount = 0;
-            Random random = rand;
-            AddAnimals(random);
+            AddAnimals(rand);
         }
 
         public void ShowInfo()
@@ -128,7 +127,7 @@ namespace HomeWork1
 
             for (int i = 0; i < countAnimal; i++)
             {
-                int randomSex = rand.Next((int)Sex.male,(int)Sex.female+1);
+                int randomSex = rand.Next((int)Sex.male, (int)Sex.female + 1);
 
                 if (randomSex == (int)Sex.male)
                 {
