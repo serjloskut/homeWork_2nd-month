@@ -34,22 +34,22 @@ namespace HomeWork1
 
         public void Work()
         {
-            int countWhile = 10;
+            int countRepetitions = 10;
 
-            for (int i = 0; i < countWhile; i++)
+            for (int i = 0; i < countRepetitions; i++)
             {
                 int number = int.MaxValue;
 
                 while (number > _aviaries.Count - 1)
                 {
-                    Console.WriteLine($"Вы можете посмотреь {countWhile - i} вольеров. Выберите, к какому вольеру вы хотите подойти.");
+                    Console.WriteLine($"Вы можете посмотреь {countRepetitions - i} вольеров. Выберите, к какому вольеру вы хотите подойти.");
 
                     for (int j = 0; j < _aviaries.Count; j++)
                     {
                         Console.WriteLine("Вольер №" + j);
                     }
 
-                    number = GetNumber();
+                    number = GetPositiveNumber();
 
                     if (number > _aviaries.Count - 1)
                     {
@@ -66,7 +66,7 @@ namespace HomeWork1
             }
         }
 
-        private int GetNumber()
+        private int GetPositiveNumber()
         {
             int resultParse = -1;
             bool isContinue = true;
@@ -77,13 +77,14 @@ namespace HomeWork1
                 {
                     Console.Write("Необходимо ввести число! Повпробуйте ввести еще раз: ");
                 }
-                else
+                else if (resultParse < 0)
                 {
-                    if (resultParse < 0)
-                        Console.Write("Необходимо ввести число больше нуля! Повпробуйте ввести еще раз: ");
-                    else
-                        isContinue = false;
+
+                    Console.Write("Необходимо ввести число больше нуля! Повпробуйте ввести еще раз: ");
                 }
+                else
+                    isContinue = false;
+
             }
 
             return resultParse;
@@ -129,16 +130,12 @@ namespace HomeWork1
             {
                 int randomSex = rand.Next((int)Sex.male, (int)Sex.female + 1);
 
+                _animals.Add(new Animal(_arrayAnimalsAndSounds[numberAnimal, 0], (Sex)randomSex, _arrayAnimalsAndSounds[numberAnimal, 1]));
+
                 if (randomSex == (int)Sex.male)
-                {
-                    _animals.Add(new Animal(_arrayAnimalsAndSounds[numberAnimal, 0], "Мужской", _arrayAnimalsAndSounds[numberAnimal, 1]));
                     _maleCount++;
-                }
                 else
-                {
-                    _animals.Add(new Animal(_arrayAnimalsAndSounds[numberAnimal, 0], "Женский", _arrayAnimalsAndSounds[numberAnimal, 1]));
                     _femaleCount++;
-                }
             }
         }
     }
@@ -146,10 +143,10 @@ namespace HomeWork1
     class Animal
     {
         public string Name { get; private set; }
-        public string Sex { get; private set; }
+        public Sex Sex { get; private set; }
         public string Sound { get; private set; }
 
-        public Animal(string name, string sex, string sound)
+        public Animal(string name, Sex sex, string sound)
         {
             Name = name;
             Sound = sound;
