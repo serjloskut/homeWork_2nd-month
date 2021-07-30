@@ -1,0 +1,163 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.IO;
+
+namespace HomeWork1
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            int countPatient = 20;
+
+            Hospital hospital = new Hospital(countPatient);
+            hospital.Work();
+        }
+    }
+
+    class Hospital
+    {
+        private List<Patient> _patients;
+        private List<string> _disease;
+
+        public Hospital(int countPatient)
+        {
+            _patients = new List<Patient>();
+            _disease = new List<string> { "Пневмония", "Оспа", "ОРВИ", "ОРЗ", "Коронавирус" };
+            Random random = new Random();
+            List<string> surname = new List<string> { "Иванов", "Петров", "Сидоров", "Кошкин", "Комаров" };
+            List<string> name = new List<string> { "Сергей", "Алексей", "Иван", "Петр", "Валентин" };
+            List<string> patronymic = new List<string> { "Олегович", "Анатольевич", "Петрович", "Иванович", "Сидорович" };
+            
+
+            for (int i = 0; i < countPatient; i++)
+            {
+                _patients.Add(new Patient(surname[random.Next(0, surname.Count)], name[random.Next(0, surname.Count)], patronymic[random.Next(0, surname.Count)], random, _disease[random.Next(0, surname.Count)]));
+            }
+        }
+
+        public void Work()
+        {
+            bool continueWhile = true;
+
+            while (continueWhile)
+            {
+                Console.Write("Доступные команды для выполнения:\n" +
+                    "0. Вывести список всех больных\n" +
+                    "1. Отсортировать всех больных по фио\n" +
+                    "2. Отсортировать всех больных по возрасту.\n" +
+                    "3. Вывести больных с определенным заболеванием.\n" +
+                    "4. Выход из программы.\n\n" +
+                    "Введите номер команды: ");
+
+                switch (Console.ReadLine())
+                {
+                    case "0":
+                        ShowAllPatients();
+                        Console.WriteLine("\nНажмите любую клавишу для продолжения...");
+                        Console.ReadKey();
+                        break;
+                    case "1":
+                        SortByFullName();
+                        Console.WriteLine("\nНажмите любую клавишу для продолжения...");
+                        Console.ReadKey();
+                        break;
+                    case "2":
+                        SortByAge();
+                        Console.WriteLine("\nНажмите любую клавишу для продолжения...");
+                        Console.ReadKey();
+                        break;
+                    case "3":
+                        ShowAllPatientsWithCertainDisease();
+                        Console.WriteLine("\nНажмите любую клавишу для продолжения...");
+                        Console.ReadKey();
+                        break;
+                    case "4":
+                        continueWhile = false;
+                        break;
+                    default:
+                        Console.WriteLine("Вы ввели неверную команду. Попробуйте еще раз. Нажмите любую клавишу для продолжения...");
+                        Console.ReadKey();
+                        break;
+                }
+
+                Console.Clear();
+            }
+        }
+
+        private void SortByFullName()
+        {
+            var sortedPatients = from patient in _patients
+                                 orderby patient.FullName
+                                 select patient;
+
+            foreach (var patient in sortedPatients)
+            {
+                Console.WriteLine($"{patient.FullName} - {patient.Disease}. Возраст: {patient.Age}");
+            }
+        }
+
+        private void ShowAllPatients()
+        {
+            for (int i = 0; i < _patients.Count; i++)
+            {
+                Console.WriteLine($"{_patients[i].FullName} - {_patients[i].Disease}. Возрас: {_patients[i].Age}");
+            }
+        }
+
+        private void SortByAge()
+        {
+            var sortedPatients = from patient in _patients
+                                 orderby patient.Age
+                                 select patient;
+
+            foreach (var patient in sortedPatients)
+            {
+                Console.WriteLine($"{patient.FullName} - {patient.Age}");
+            }
+        }
+
+        private void ShowAllPatientsWithCertainDisease()
+        {
+            Console.Write("Введите название болезни");
+
+            for (int i = 1; i <= _disease.Count; i++)
+            {
+                if (i==_disease.Count)
+                    Console.Write($" {_disease[i-1]}");
+                else
+                    Console.Write($" {_disease[i-1]},");
+            }
+
+            Console.Write(": ");
+
+            string userDisease= Console.ReadLine();
+
+            var filteredPatients = from patient in _patients
+                                 where patient.Disease.ToLower()==userDisease.ToLower()
+                                 select patient;
+
+            foreach (var patient in filteredPatients)
+            {
+                Console.WriteLine($"{patient.FullName} - {patient.Disease}");
+            }
+        }
+    }
+
+    class Patient
+    {
+        public string FullName { get; private set; }
+        public int Age { get; private set; }
+        public string Disease { get; private set; }
+
+        public Patient(string surname, string name, string patronymic, Random randomAge, string disease)
+        {
+            FullName = surname + " " + name + " " + patronymic;
+            Age = randomAge.Next(20,50);
+            Disease = disease;
+        }
+    }
+}
