@@ -125,7 +125,8 @@ namespace HomeWork1
             int topIndent = 10;
             Console.SetCursorPosition(0, topIndent);
             Console.WriteLine($"На балансе автосервиса {_money} рублей.");
-            topIndent += 2;
+            int indent=2;
+            topIndent += indent;
             Console.WriteLine($"В наличии на складе следующие детали:");
 
             foreach (var detail in _detailsInStock)
