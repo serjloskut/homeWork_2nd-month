@@ -12,108 +12,192 @@ namespace HomeWork1
         static void Main(string[] args)
         {
             int countClients = 10;
-            CarService carService = new CarService(countClients);
+            List<string> detailsOfClientsToFix = new List<string>
+            {
+                "Бампер Задний",
+                "Бампер Передний",
+                "Дверь",
+                "Двигатель",
+                "Колесо",
+                "Поворотник",
+                "Руль"
+            };
+            CarService carService = new CarService(countClients, detailsOfClientsToFix);
+
+            carService.Work();
         }
     }
 
     class CarService
     {
-        private Dictionary<Detail, int> _warehousDetails;
         private Queue<Client> _clients;
-        private Random _random;
+        private Dictionary<DetailWithPrice, int> _detailsInStock;
         private int _money;
-        private int _priceForWorkInPercent;
-        private int _pricePenaltyInPercent;
+        private int _pricePenalty;
 
-        public int RepairCost { get; private set; }
-
-        public CarService(int count)
+        public CarService(int countClients, List<string> detailsOfClientsToFix)
         {
-            _warehousDetails = new Dictionary<Detail, int>();
+            _money = 100000;
+            _pricePenalty= 1000;
+            _detailsInStock = new Dictionary<DetailWithPrice, int>();
             _clients = new Queue<Client>();
-            _random = new Random();
-            _money = 0;
-            _priceForWorkInPercent = 10;
-            _pricePenaltyInPercent = 5;
 
-            int random = _random.Next(5,10);
-
-            for (int i = 0; i < random; i++)
+            Random rand = new Random();
+            List<string> details = new List<string>
             {
-                AddDetailToWarehouse();
+                "Дверь",
+                "Двигатель",
+                "Колесо",
+                "Поворотник",
+                "Руль"
+            };
+
+            for (int i = 0; i < details.Count; i++)
+            {
+                _detailsInStock.Add(new DetailWithPrice(details[i], rand.Next(10, 30) * 100), rand.Next(1,3));
+            }
+
+            for (int i = 0; i < countClients; i++)
+            {
+                _clients.Enqueue(new Client(rand, detailsOfClientsToFix[rand.Next(0, detailsOfClientsToFix.Count)]));
             }
         }
 
-        private void AddNewClient()
+        public void Work()
         {
-
-        }
-
-        private void AddDetailToWarehouse()
-        {
-            Console.Write("Введите название детали: ");
-            string name = Console.ReadLine();
-
-            Console.Write("Введите количество деталей: ");
-            int count = TryParseNumber();
-
-            Detail detail = IsInStock(name);
-
-            if (detail == null)
+            while (_clients.Count > 0 && _money >= 0)
             {
-                Console.Write("Такой детали на складе еще не было. Введите стоимость детали: ");
-                int price = TryParseNumber();
-                _warehousDetails.Add(new Detail(name, price),count);
+                ShowInfoInStatusBar();
+
+                Console.WriteLine($"В очереди {_clients.Count} клиентов. Нажмите любую клавишу чтобы обслужить клиента...");
+                Console.ReadKey();
+
+                Client client = _clients.Dequeue();
+                client.ShowInfo();
+
+                Console.WriteLine("\nЧтобы починить деталь, введите 1,чтобы отказать клиенту, введите любую букву/цифру");
+
+                switch (Console.ReadLine())
+                {
+                    case "1":
+                        Console.WriteLine("Введите название детали, которую хотите поставить клиенту взамен сломанной");
+                        string userDetail = Console.ReadLine();
+
+                        if (IsInStock(userDetail))
+                        {
+                            if (ReturnRightOrWrongFixDetail(userDetail, client))
+                            {
+                                RemoveDetail(userDetail);
+                                TakePayment(userDetail);
+                                Console.WriteLine("Вы заменили клиенту деталь. Сервис получил вознаграждение. Нажмите любую клавишу...");
+                                Console.ReadKey();
+                            }
+                            else
+                            {
+                                RemoveDetail(userDetail);
+                                PayDamage(userDetail);
+                                Console.WriteLine("Вы заменили клиенту неверную деталь. Ущерб в размере стоимости детали оплачивает сервис. Нажмите любую клавишу...");
+                                Console.ReadKey();
+                            }
+                        }
+                        else
+                        {
+                            PayFine();
+                            Console.WriteLine("Вы ввели несуществующую на складе деталь. Клиент ушел и сервис получил штраф. Будьте внимательнее!!! Нажмите любую клавишу...");
+                            Console.ReadKey();
+                        }
+                        break;
+                    default:
+                        PayFine();
+                        Console.WriteLine("Вы отказали клиенту. Сервис получил штраф. Нажмите любую клавишу...");
+                        Console.ReadKey();
+                        break;
+                }
+
+                Console.Clear();
             }
-            else
+        }
+
+        private void ShowInfoInStatusBar()
+        {
+            int topIndent = 10;
+            Console.SetCursorPosition(0, topIndent);
+            Console.WriteLine($"На балансе автосервиса {_money} рублей.");
+            topIndent += 2;
+            Console.WriteLine($"В наличии на складе следующие детали:");
+
+            foreach (var detail in _detailsInStock)
             {
-                _warehousDetails[detail] += count;
+                detail.Key.ShowInfo(topIndent);
+                Console.WriteLine($"Кол-во: {detail.Value}.");
+                topIndent++;
             }
+
+            Console.SetCursorPosition(0, 0);
         }
 
-        private int TryParseNumber()
+        private bool ReturnRightOrWrongFixDetail (string userDetail, Client client)
         {
-            int resultParse;
+            return userDetail.ToLower() == client.BrokenDetail.Name.ToLower();
+        }
 
-            while (int.TryParse(Console.ReadLine(), out resultParse) == false)
+        private void RemoveDetail(string userDetail)
+        {
+            foreach (var detail in _detailsInStock)
             {
-                Console.Write("Необходимо ввести число! Повпробуйте ввести еще раз: ");
+                if (detail.Key.Name.ToLower() == userDetail.ToLower())
+                {
+                    _detailsInStock[detail.Key]--;
+                    break;
+                }
             }
-
-            return resultParse;
         }
 
-        private void FixDetail()
+        private void TakePayment(string userDetail)
         {
-
-        }
-
-        private void RemoveDetail()
-        {
-
-        }
-
-        private void TakePayment()
-        {
-
+            _money+= GetPriceDetail(userDetail);
         }
 
         private void PayFine()
         {
-
+            _money -= _pricePenalty;
         }
 
-        private Detail IsInStock(string name)
+        private int GetPriceDetail(string userDetail)
         {
-            Detail detailInStock = null;
+            int price = int.MinValue;
 
-            foreach (var detail in _warehousDetails)
+            foreach (var detail in _detailsInStock)
             {
-                if (detail.Key.Name == name)
-                    detailInStock=detail.Key;
+                if (detail.Key.Name.ToLower() == userDetail.ToLower())
+                {
+                    price = detail.Key.Price;
+                    break;
+                }
             }
 
-            return detailInStock;
+            return price;
+        }
+
+        private void PayDamage(string userDetail)
+        {
+            _money -= GetPriceDetail(userDetail);
+        }
+
+        private bool IsInStock(string name)
+        {
+            bool isStock = false;
+
+            foreach (var detail in _detailsInStock)
+            {
+                if (detail.Key.Name.ToLower()==name.ToLower())
+                {
+                    isStock = true;
+                    break;
+                }
+            }
+
+            return isStock;
         }
     }
 
@@ -123,21 +207,42 @@ namespace HomeWork1
 
         public Detail BrokenDetail { get; private set; }
 
-        public Client(Detail detail)
+        public Client(Random rand, string nameDetail)
         {
-            BrokenDetail = detail;
+            _money = rand.Next(30, 100) * 100;
+            BrokenDetail = new Detail(nameDetail);
+        }
+
+        public void ShowInfo()
+        {
+            Console.WriteLine($"\nКлиент хочет починить следующую деталь: {BrokenDetail.Name}");
         }
     }
 
     class Detail
     {
         public string Name { get; private set; }
-        public int Price { get; private set; }
 
-        public Detail(string name, int price)
+        public Detail(string name)
         {
             Name = name;
+        }
+    }
+
+    class DetailWithPrice : Detail
+    {
+        public int Price { get; private set; }
+
+        public DetailWithPrice(string name, int price) : base(name)
+        {
             Price = price;
+        }
+
+        public void ShowInfo(int topIndent)
+        {
+            Console.Write($"Деталь: {Name}. ");
+            Console.SetCursorPosition(20, topIndent);
+            Console.Write($"Стоимость детали: {Price}. ");
         }
     }
 }
