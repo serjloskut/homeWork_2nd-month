@@ -1,0 +1,61 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.IO;
+
+namespace HomeWork1
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Random rand = new Random();
+            List<Prisoner> prisoners = new List<Prisoner>
+            {
+                new Prisoner("Иванов И.А.", (Crime)rand.Next(1,3)),
+                new Prisoner("Петьков О.А.", (Crime)rand.Next(1,3)),
+                new Prisoner("Петров А.А.", (Crime)rand.Next(1,3)),
+                new Prisoner("Сидоров О.Г.", (Crime)rand.Next(1,3)),
+                new Prisoner("Коасров Д.В.", (Crime)rand.Next(1,3)),
+                new Prisoner("Штрован В.А.", (Crime)rand.Next(1,3)),
+                new Prisoner("Шораневпев Л.А.",(Crime)rand.Next(1,3)),
+            };
+
+            foreach (var prisoner in prisoners)
+            {
+                Console.WriteLine($"{prisoner.FullName} - {prisoner.Crime}");
+            }
+
+            var filteredPrisoners = prisoners.Where(prisoner => prisoner.Crime != (Crime)2);
+
+            Console.WriteLine();
+
+            foreach(var prisoner in filteredPrisoners)
+            {
+                Console.WriteLine(prisoner.FullName);
+            }
+
+            Console.ReadKey();
+        }
+    }
+
+    class Prisoner
+    {
+        public string FullName { get; private set; }
+        public Crime Crime { get; private set; }
+
+        public Prisoner(string fullName, Crime crime)
+        {
+            FullName = fullName;
+            Crime = crime;
+        }
+    }
+
+    enum Crime
+    {
+        AntiGovernment = 1,
+        NotAntiGovernment = 2,
+    }
+}
