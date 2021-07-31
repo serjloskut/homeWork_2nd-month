@@ -1,0 +1,89 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.IO;
+
+namespace HomeWork1
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            ShowExpiredStews();
+        }
+
+        static void ShowExpiredStews()
+        {
+            int nowYear = DateTime.Now.Year;
+            int minProductionYear = 2000;
+            int maxProductionYear = 2020;
+            int minShelfLife = 1;
+            int maxShelfLife = 5;
+            int countStews = 20;
+
+            List<Stew> stews = CreateListStews(countStews, minProductionYear, maxProductionYear, minShelfLife, maxShelfLife);
+
+            var stewExpired = stews.Where(stew => ((stew.ProductionYear + stew.ShelfLife) < nowYear) == true);
+
+            foreach (var stew in stewExpired)
+            {
+                Console.WriteLine($"{stew.ProductName} - {stew.ProductionYear} - {stew.ShelfLife}");
+            }
+
+            Console.ReadKey();
+        }
+
+        static List<Stew> CreateListStews(int count, int minProductionYear, int maxProductionYear, int minShelfLife, int maxShelfLife)
+        {
+            List<Stew> stews = new List<Stew>();
+            Random random = new Random();
+
+            for (int i = 0; i < count; i++)
+            {
+                stews.Add(new Stew((ProductName)random.Next(0, CountAmountOfEnum(typeof(ProductName))), random.Next(minProductionYear, maxProductionYear + 1), random.Next(minShelfLife,maxShelfLife+1)));
+            }
+
+            return stews;
+        }
+
+        static int CountAmountOfEnum(Type enumType)
+        {
+            var array = Enum.GetValues(enumType);
+            int i = 0;
+
+            foreach (var item in array)
+            {
+                i++;
+            }
+
+            return i;
+        }
+    }
+
+    class Stew
+    {
+        public string ProductName { get; private set; }
+        public int ProductionYear { get; private set; }
+        public int ShelfLife { get; private set; }
+
+        public Stew(ProductName productName, int prodactionYear, int shelfLife)
+        {
+            ProductName = productName.ToString();
+            ProductionYear = prodactionYear;
+            ShelfLife = shelfLife;
+        }
+    }
+
+    enum ProductName
+    {
+        Тушенка1,
+        Тушенка2,
+        Тушенка3,
+        Тушенка4,
+        Тушенка5,
+        Тушенка6,
+        Тушенка7
+    }
+}
