@@ -21,29 +21,24 @@ namespace HomeWork1
     class Hospital
     {
         private List<Patient> _patients;
-        private List<string> _disease;
 
         public Hospital(int countPatient)
         {
             _patients = new List<Patient>();
-            _disease = new List<string> { "Пневмония", "Оспа", "ОРВИ", "ОРЗ", "Коронавирус" };
             Random random = new Random();
-            List<string> surname = new List<string> { "Иванов", "Петров", "Сидоров", "Кошкин", "Комаров" };
-            List<string> name = new List<string> { "Сергей", "Алексей", "Иван", "Петр", "Валентин" };
-            List<string> patronymic = new List<string> { "Олегович", "Анатольевич", "Петрович", "Иванович", "Сидорович" };
-            
+
 
             for (int i = 0; i < countPatient; i++)
             {
-                _patients.Add(new Patient(surname[random.Next(0, surname.Count)], name[random.Next(0, surname.Count)], patronymic[random.Next(0, surname.Count)], random, _disease[random.Next(0, surname.Count)]));
+                _patients.Add(new Patient((Surname)random.Next(0, CountAmountOfEnum(typeof(Surname))), (Name)random.Next(0, CountAmountOfEnum(typeof(Name))), (Patronymic)random.Next(0, CountAmountOfEnum(typeof(Patronymic))), random, (Disease)random.Next(0, CountAmountOfEnum(typeof(Disease)))));
             }
         }
 
         public void Work()
         {
-            bool continueWhile = true;
+            bool isWork = true;
 
-            while (continueWhile)
+            while (isWork)
             {
                 Console.Write("Доступные команды для выполнения:\n" +
                     "0. Вывести список всех больных\n" +
@@ -57,26 +52,22 @@ namespace HomeWork1
                 {
                     case "0":
                         ShowAllPatients();
-                        Console.WriteLine("\nНажмите любую клавишу для продолжения...");
-                        Console.ReadKey();
+                        PrintPressAnyKey();
                         break;
                     case "1":
                         SortByFullName();
-                        Console.WriteLine("\nНажмите любую клавишу для продолжения...");
-                        Console.ReadKey();
+                        PrintPressAnyKey();
                         break;
                     case "2":
                         SortByAge();
-                        Console.WriteLine("\nНажмите любую клавишу для продолжения...");
-                        Console.ReadKey();
+                        PrintPressAnyKey();
                         break;
                     case "3":
-                        ShowAllPatientsWithCertainDisease();
-                        Console.WriteLine("\nНажмите любую клавишу для продолжения...");
-                        Console.ReadKey();
+                        FilterDyDisease();
+                        PrintPressAnyKey();
                         break;
                     case "4":
-                        continueWhile = false;
+                        isWork = false;
                         break;
                     default:
                         Console.WriteLine("Вы ввели неверную команду. Попробуйте еще раз. Нажмите любую клавишу для продолжения...");
@@ -100,6 +91,25 @@ namespace HomeWork1
             }
         }
 
+        private int CountAmountOfEnum(Type enumType)
+        {
+            var array = Enum.GetValues(enumType);
+            int i = 0;
+
+            foreach (var item in array)
+            {
+                i++;
+            }
+
+            return i;
+        }
+
+        private void PrintPressAnyKey()
+        {
+            Console.WriteLine("\nНажмите любую клавишу для продолжения...");
+            Console.ReadKey();
+        }
+
         private void ShowAllPatients()
         {
             for (int i = 0; i < _patients.Count; i++)
@@ -120,25 +130,24 @@ namespace HomeWork1
             }
         }
 
-        private void ShowAllPatientsWithCertainDisease()
+        private void FilterDyDisease()
         {
-            Console.Write("Введите название болезни");
+            Console.Write("Введите название болезни ");
 
-            for (int i = 1; i <= _disease.Count; i++)
+            var arrayDisease = Enum.GetValues(typeof(Disease));
+
+            foreach (var disease in arrayDisease)
             {
-                if (i==_disease.Count)
-                    Console.Write($" {_disease[i-1]}");
-                else
-                    Console.Write($" {_disease[i-1]},");
+                Console.Write($"{disease}/");
             }
 
             Console.Write(": ");
 
-            string userDisease= Console.ReadLine();
+            string userDisease = Console.ReadLine();
 
             var filteredPatients = from patient in _patients
-                                 where patient.Disease.ToLower()==userDisease.ToLower()
-                                 select patient;
+                                   where patient.Disease.ToLower() == userDisease.ToLower()
+                                   select patient;
 
             foreach (var patient in filteredPatients)
             {
@@ -153,11 +162,47 @@ namespace HomeWork1
         public int Age { get; private set; }
         public string Disease { get; private set; }
 
-        public Patient(string surname, string name, string patronymic, Random randomAge, string disease)
+        public Patient(Surname surname, Name name, Patronymic patronymic, Random randomAge, Disease disease)
         {
             FullName = surname + " " + name + " " + patronymic;
-            Age = randomAge.Next(20,50);
-            Disease = disease;
+            Age = randomAge.Next(20, 50);
+            Disease = disease.ToString();
         }
+    }
+
+    enum Disease
+    {
+        Пневмония,
+        Оспа,
+        ОРВИ,
+        ОРЗ,
+        Коронавирус
+    }
+
+    enum Surname
+    {
+        Иванов,
+        Петров,
+        Сидоров,
+        Кошкин,
+        Комаров
+    }
+
+    enum Name
+    {
+        Сергей,
+        Алексей,
+        Иван,
+        Петр,
+        Валентин
+    }
+
+    enum Patronymic
+    {
+        Олегович,
+        Анатольевич,
+        Петрович,
+        Иванович,
+        Сидорович
     }
 }
