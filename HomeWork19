@@ -1,0 +1,95 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.IO;
+
+namespace HomeWork1
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Requests requests = new Requests();
+            requests.Work();
+        }
+    }
+
+    class Requests
+    {
+        List<Player> _players;
+
+        public Requests()
+        {
+            _players = new List<Player>();
+            Random rand = new Random();
+
+            int countPlayer = 10;
+            int minLevel = 1;
+            int maxLevel = 100;
+            int minPower = 1;
+            int maxPower = 20;
+            int coefficientPower = 5;
+
+            for (int i = 0; i < countPlayer; i++)
+            {
+                _players.Add(new Player((Name)rand.Next(0, CountAmountOfEnum(typeof(Name))), rand.Next(minLevel, maxLevel+1), rand.Next(minPower, maxPower+1) * coefficientPower));
+            }
+        }
+
+        public void Work()
+        {
+            IEnumerable<Player> sortedByLevel = _players.OrderByDescending(player => player.Level).Take(3);
+            IEnumerable<Player> sortedByPower = _players.OrderByDescending(player => player.Power).Take(3);
+            ShowInfo(sortedByLevel);
+            ShowInfo(sortedByPower);
+            Console.ReadKey();
+        }
+
+        private void ShowInfo(IEnumerable<Player> players)
+        {
+            foreach (var player in players)
+            {
+                Console.WriteLine($"{player.Name} - {player.Level} - {player.Power}");
+            }
+        }
+
+        private int CountAmountOfEnum(Type enumType)
+        {
+            var array = Enum.GetValues(enumType);
+            int i = 0;
+
+            foreach (var item in array)
+            {
+                i++;
+            }
+
+            return i;
+        }
+    }
+
+    class Player
+    {
+        public string Name { get; private set; }
+        public int Level { get; private set; }
+        public int Power { get; private set; }
+
+        public Player(Name name, int level, int power)
+        {
+            Name = name.ToString();
+            Level = level;
+            Power = power;
+        }
+    }
+
+    enum Name
+    {
+        Алексей,
+        Сергей,
+        Петр,
+        Василий,
+        Евгений,
+        Анатолий
+    }
+}
