@@ -1,0 +1,56 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.IO;
+
+namespace HomeWork1
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            List<Soldier> firstPlatoon = new List<Soldier> { new Soldier("Азотов"), new Soldier("Баранов"), new Soldier("Азотов"), new Soldier("Баранов"), new Soldier("Азотов") };
+            List<Soldier> secondPlatoon = new List<Soldier> { new Soldier("Васильков"), new Soldier("Васильков"), new Soldier("Васильков"), new Soldier("Васильков") };
+            char firstLetterSurname = 'б';
+
+            TransferSoldiers(firstPlatoon,secondPlatoon,firstLetterSurname);
+
+            ShowInfo(firstPlatoon);
+            Console.WriteLine();
+            ShowInfo(secondPlatoon);
+
+            Console.ReadKey();
+        }
+
+        static void TransferSoldiers(List<Soldier> platoonFrom, List<Soldier> platoonTo, char firstLetter)
+        {
+            var filteredFirstPlatoon = platoonFrom.OrderBy(soldier => soldier.Surname).Where(soldier => soldier.Surname.ToLower().StartsWith(firstLetter.ToString()));
+
+            foreach (var soldier in filteredFirstPlatoon)
+            {
+                platoonFrom.Remove(soldier);
+                platoonTo.Add(soldier);
+            }
+        }
+
+        static void ShowInfo(List<Soldier> soldiers)
+        {
+            for (int i = 0; i < soldiers.Count; i++)
+            {
+                Console.WriteLine(soldiers[i].Surname);
+            }
+        }
+    }
+
+    class Soldier
+    {
+        public string Surname { get; private set; }
+
+        public Soldier(string surname)
+        {
+            Surname = surname;
+        }
+    }
+}
