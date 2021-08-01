@@ -79,16 +79,21 @@ namespace HomeWork1
             }
         }
 
+        private void ShowInfo(IEnumerable<Patient> patients)
+        {
+            foreach (var patient in patients)
+            {
+                patient.ShowInfo();
+            }
+        }
+
         private void SortByFullName()
         {
             var sortedPatients = from patient in _patients
                                  orderby patient.FullName
                                  select patient;
 
-            foreach (var patient in sortedPatients)
-            {
-                Console.WriteLine($"{patient.FullName} - {patient.Disease}. Возраст: {patient.Age}");
-            }
+            ShowInfo(sortedPatients);
         }
 
         private int CountAmountOfEnum(Type enumType)
@@ -114,7 +119,7 @@ namespace HomeWork1
         {
             for (int i = 0; i < _patients.Count; i++)
             {
-                Console.WriteLine($"{_patients[i].FullName} - {_patients[i].Disease}. Возрас: {_patients[i].Age}");
+                _patients[i].ShowInfo();
             }
         }
 
@@ -124,10 +129,7 @@ namespace HomeWork1
                                  orderby patient.Age
                                  select patient;
 
-            foreach (var patient in sortedPatients)
-            {
-                Console.WriteLine($"{patient.FullName} - {patient.Age}");
-            }
+            ShowInfo(sortedPatients);
         }
 
         private void FilterDyDisease()
@@ -149,10 +151,7 @@ namespace HomeWork1
                                    where patient.Disease.ToLower() == userDisease.ToLower()
                                    select patient;
 
-            foreach (var patient in filteredPatients)
-            {
-                Console.WriteLine($"{patient.FullName} - {patient.Disease}");
-            }
+            ShowInfo(filteredPatients);
         }
     }
 
@@ -167,6 +166,11 @@ namespace HomeWork1
             FullName = surname + " " + name + " " + patronymic;
             Age = randomAge.Next(20, 50);
             Disease = disease.ToString();
+        }
+
+        public void ShowInfo()
+        {
+            Console.WriteLine($"{FullName} - {Disease}. Возрас: {Age}");
         }
     }
 
